@@ -56,7 +56,7 @@ fi
 ```
 
 ### Checking pipeline specific variable are defined
-Given required software and reference datasets are *'baked'* into the AMI. The *'start.sh'* can act as a config file that python application can reference, when running the *'HaplotypeCaller.sh'*. 
+Given required software and reference datasets are *'baked'* into the AMI. The *'start.sh'* can act as a config file that the python application can reference, when running the *'HaplotypeCaller.sh'* task script for example. 
 
 ```bash
 # Terminate if any key reference data failed their assigments: start.sh
@@ -71,7 +71,7 @@ aws s3 cp logging_${jobID}.txt s3://${workflow}/logs/logging_${jobID}.txt
 
 
 ### Sanity check pipeline can run
-Running the application as a background, opens up coding possibilties for monitoring the pipeline. Initially this can take the form of terminating the active instance, if the application is no longer running after a short time window. Useful scenario to minimize wasted CPU hrs if a mistake if ever made on creating tasks for DynamoDB, examples could be referencing an input file that does not exist, or no tasks were uploaded to DynamoDB for instance.
+Running the application as a background job, opens up coding possibilties for monitoring the pipeline. Initially this can take the form of terminating the active instance, if the application is no longer running after a short time window. Useful scenario to minimize wasted CPU hrs if a mistake if ever made on creating tasks for DynamoDB, examples could be referencing an input file that does not exist, or no tasks were uploaded to DynamoDB for instance.
 
 ```bash
 # Run application: 	View & instance ID
