@@ -71,7 +71,7 @@ aws s3 cp logging_${jobID}.txt s3://${workflow}/logs/logging_${jobID}.txt
 
 
 ### Sanity check pipeline can run
-Running the application as a background, opens up coding possibilties for monitoring the pipeline. Initially this can take the form of terminating the active instance, if the application is no longer running after a short time window. Useful to scenario minimize wasted CPU hrs if a mistake if ever made on creating tasks for DynamoDB, examples could be referencing an input file that does not exist, or no tasks were uploaded to DynamoDB for instance.
+Running the application as a background, opens up coding possibilties for monitoring the pipeline. Initially this can take the form of terminating the active instance, if the application is no longer running after a short time window. Useful scenario to minimize wasted CPU hrs if a mistake if ever made on creating tasks for DynamoDB, examples could be referencing an input file that does not exist, or no tasks were uploaded to DynamoDB for instance.
 
 ```bash
 # Run application: 	View & instance ID
@@ -93,7 +93,7 @@ fi
 ### Additional stuff
 One can also set an App Time Out code block, which monitors the application at a fixed time interval so that it is possible to terminate the instance if the application is no longer running. The code block could also be extended to write out files that PyAnamo could read, so as to open communicating between Monitoring and Execution if required.
 
-``bash
+```bash
 # Check application
 count=0
 iter=0
@@ -124,11 +124,11 @@ while [ ${count} -lt ${AppTimeOut} ]
 	sleep 1h
 
 done
-``
+```
 
 
 # Pipeline Level
-The *'attitude'* of 'Pyanamo' is to iterate over all available tasks and execute the value of *'Task Script'* key. Meaning that if any given task exits, Pyanamo moves onto to the next one. With a well debugged generic task script, it very useful that if one of the ~30k samples fails to mount, the entire cluster does not explode.
+The *'attitude'* of **'Pyanamo'** is to iterate over all available tasks and execute the value of the active *'Task Script'* key. Meaning that if any given task exits, Pyanamo moves onto to the next one. With a well debugged generic task script, it very useful that if one out of the ~30k samples fails to mount, the entire cluster does not explode.
 
 ### Mounting TOPMed raw sequence data
 Since no input means, no output, best starting point is to avoid slowness on mounting. 
@@ -180,6 +180,7 @@ for chrom in chr{1..22} chr{X..Y}
 	aws s3 --quiet ${wrk}/${chrom}/${SM}-${chrom}.vcf.log ${s3_gvcf}/${SM}/${chrom}/${SM}-${chrom}.vcf.log
 	aws s3 --quiet ${wrk}/${chrom}/${SM}.${chrom}.g.vcf.gz.tbi ${s3_gvcf}/${SM}/${chrom}/${SM}.${chrom}.g.vcf.gz.tbi
 	aws s3 --quiet ${wrk}/${chrom}/${SM}.${chrom}.g.vcf.gz_checks.tsv ${s3_gvcf}/${SM}/${chrom}/${SM}.${chrom}.tsv
+
 
 	# Clear temp dir
 	echo -e "\\nChecking complete\\nProcessing complete for:   ${SM}-${chrom}\\n"
