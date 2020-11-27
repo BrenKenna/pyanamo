@@ -13,11 +13,11 @@ The combination of a super simple **'Start a Cluster of HaplotypeCaller or Seque
 # Example
 The current tutorial developed from some *'Free Tier'* work on AWS, and our currently *very excited* to be porting this onto a **DynamoDB back-end** instead of couchDB backend *(overall principal is the same)*. The example consits of two steps:
 
-**1). Create a to do task and store in DB.
+**1). Create a to do task and store in DB**.
 
-**2). Startup a pipeline step specific cluster.
+**2). Startup a pipeline step specific cluster**.
 
-**NB: The example assumes AWS, DynamoDB and dbGaP authorization, alongside an AMI + an EC2 launch template (named by step in workflow).
+**NB: The example assumes AWS, DynamoDB and dbGaP authorization, alongside an AMI + an EC2 launch template (named by step in workflow)**.
 
 
 
