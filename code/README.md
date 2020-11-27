@@ -1,5 +1,5 @@
 # What is stuff doing?
-The purpose of this README is to provide an *overview* of some of the key features that are *'under the hood'*. 
+The purpose of this README is to provide an *overview* of some of the key features that are *'under the hood'* in the *'Example Free Tier'* code. 
 
 
 ## Cluster level
