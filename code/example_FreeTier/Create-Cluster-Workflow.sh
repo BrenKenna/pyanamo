@@ -31,4 +31,5 @@ aws ec2 run-instances --count ${Njobs} --user-data file://~/custom-pipeline/EC2-
 
 # Kill instances
 instanceIDs=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${Worfklow}" --query 'Reservations[*].Instances[*].{Instance:InstanceId}' | grep "Instance" | cut -d \" -f 4 | xargs)
+sleep 96hr
 aws ec2 terminate-instances --instance-ids ${instanceIDs} > terminationLog.txt
