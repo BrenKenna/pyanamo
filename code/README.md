@@ -131,7 +131,7 @@ done
 The *'attitude'* of **'Pyanamo'** is to iterate over all available tasks and execute the value of the active *'Task Script'* key. Meaning that if any given task exits, Pyanamo moves onto to the next one. With a well debugged generic task script, it very useful that if one out of the ~30k samples fails to mount, the entire cluster does not explode.
 
 ### Mounting TOPMed raw sequence data
-Since no input means, no output, best starting point is to avoid slowness on mounting. 
+Since no input means, no output, best starting point is to avoid slowness on mounting. So that you can cash-in on the data that is quickest to mount, and return to the *'slow burners'* at a later date ;).
 ```bash
 
 # Mount data
