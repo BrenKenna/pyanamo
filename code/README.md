@@ -3,7 +3,7 @@ The purpose of this README is to provide an *overview* of some of the key featur
 
 
 ## Cluster level
-With all the required software debugged + key reference datasets *'baked'* into the AMI, and launch templates for each cluster. One can just simply start an **EC2 Spot Instance Cluster** to run a script which queries itself to find out which pipeline to run :)
+With all the required debugged software + key reference datasets *'baked'* into the AMI, and launch templates for each cluster. One can just simply start an **EC2 Spot Instance Cluster** to run a script which queries itself to find out which pipeline to run :)
 
 ```bash
 # Set cluster parameters
@@ -43,7 +43,7 @@ done
 ## User Data Script Level
 
 ### Exiting on fatal errors which will prevent pipeline from doing its job
-Code snippet of some sanity checks that if ever fail, terminate the *'active'* instance. So as to avoid needlessly wasting hours / money. With an overall attitude of looking for reasons to not run the application, one can be confident that when things are running in *'full swing'*, things are being productive.... Depending on what one adds of course ;)
+Code snippet of some sanity checks, that if ever fail terminate the *'active'* instance. So as to avoid needlessly wasting hours / money. With an overall attitude of looking for reasons to not run the application, one can be confident that when things are running in *'full swing'*, things are being productive.... Depending on what one adds of course ;)
 
 ```bash
 # Terminate if S3 Permissions are not verified (Public & Private)
@@ -56,7 +56,7 @@ fi
 ```
 
 ### Checking pipeline specific variable are defined
-Given required software and reference datasets are *'baked'* into the AMI. The *'start.sh'* can act as a config file that python application can reference, when running the *'HaplotypeCaller.sh'*. 
+Given required software and reference datasets are *'baked'* into the AMI. The *'start.sh'* can act as a config file that the python application can reference, when running the *'HaplotypeCaller.sh'* task script for example. 
 
 ```bash
 # Terminate if any key reference data failed their assigments: start.sh
@@ -71,7 +71,7 @@ aws s3 cp logging_${jobID}.txt s3://${workflow}/logs/logging_${jobID}.txt
 
 
 ### Sanity check pipeline can run
-Running the application as a background, opens up coding possibilties for monitoring the pipeline. Initially this can take the form of terminating the active instance, if the application is no longer running after a short time window. Which is useful to minimize wasted CPU hrs if a mistake if ever made on creating tasks for DynamoDB, examples could be referencing an input file that does not exist, or no tasks were uploaded to DynamoDB for instance.
+Running the application as a background job, opens up coding possibilties for monitoring the pipeline. Initially this can take the form of terminating the active instance, if the application is no longer running after a short time window. Useful scenario to minimize wasted CPU hrs if a mistake if ever made on creating tasks for DynamoDB, examples could be referencing an input file that does not exist, or no tasks were uploaded to DynamoDB for instance.
 
 ```bash
 # Run application: 	View & instance ID
@@ -128,10 +128,10 @@ done
 
 
 # Pipeline Level
-The *'attitude'* of **Pyanamo** is to iterate over all of the available tasks and execute the value of the active *'Task Script'* key. Meaning that if any given task exits, Pyanamo moves onto to the next one. With a well debugged generic task script, it very useful that if one out of the ~30k samples fails to mount, the entire cluster does not explode.
+The *'attitude'* of **'Pyanamo'** is to iterate over all available tasks and execute the value of the active *'Task Script'* key. Meaning that if any given task exits, Pyanamo moves onto to the next one. With a well debugged generic task script, it very useful that if one out of the ~30k samples fails to mount, the entire cluster does not explode.
 
 ### Mounting TOPMed raw sequence data
-Since no input means, no output, best starting point is to avoid slowness on mounting. So one can cash-in on the quickest to mount, and return to the slow burners later ;).
+Since no input means, no output, best starting point is to avoid slowness on mounting. 
 ```bash
 
 # Mount data
@@ -149,7 +149,7 @@ fi
 ```
 
 ### Iteratively calling the genome per sample: chr1-22, chrX-Y
-Since **'Spot Interruptions'** can happen after a few hours and the HaplotypeCaller takes ~8hrs on 2 threads. We openned up the task level to run on each chromosome. Facilitating taking the rest of the genome for a sample on another pipeline specific cluster later. Sanity checking the data after variant calling, opens up the possibility of concatinating / storing these sanity checks in a SQL database, which can be reviewed later for analysis. Also important is to clean up temporary data, and dismounting *'TOPMed US-East-1 S3 bucket'*.
+Since **'Spot Interruptions'** can happen after a few hours and the HaplotypeCaller takes ~8hrs on 2 threads. We openned up the task level to run on each chromosome. Facilitating taking the rest of the genome for sample on another pipeline specific cluster later. Sanity checking the data after variant calling, opens up the possibility of concatinating / storing these sanity checks in a SQL database, which can be reviewed later for analysis. Also important is to clean up temporary data, and dismounting *'TOPMed US-East-1 S3 bucket'*.
 
 ```bash
 # Call autosome & sex chromosomes
@@ -183,7 +183,7 @@ for chrom in chr{1..22} chr{X..Y}
 
 
 	# Clear temp dir
-	echo -e "\\nrocessing complete for:   ${SM}-${chrom}\\n"
+	echo -e "\\nChecking complete\\nProcessing complete for:   ${SM}-${chrom}\\n"
 	cd ${wrk}
 	rm -fr ${chrom}*
 
