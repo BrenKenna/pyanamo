@@ -1,7 +1,7 @@
 # LiAnamo-Beta
-The purpose of this was to get the *'lay of the land'* of all things DynamoDB, whose code will ultimately get swallowed by the **PyAnamo for Aim-2**, which also extends to development suggestions such as Schema & Indexes etc.
+The purpose of this was to get the *'lay of the land'* of all things DynamoDB using shell scripts (hence *LiAnanmo-Beta*). The overall principal of the code will ultimately get swallowed by a Python based implementation **PyAnamo for Aim-2**, which also extends to updates to the Schema & Indexes or other additional fun stuff.
 
-Code requires installing the Parallel and JQ software, as well as the *"dynamo-import.txt"* located in the *"parallel_tests"* directory. Additional sub-directories and other text files are explained / referenced in this README.md
+The code requires installing the *"Parallel"* and *"JQ"* software, as well as the *"dynamo-import.txt"* text file. The context of the additional sub-directories and other text files are explained / referenced in this README.md
 
 
 ## Creating and Populating the Test Table
@@ -29,8 +29,6 @@ mkdir -p ${wrk}/parallel_tests
 # Regenerate the workflow table and import the test items
 rm -f ${wrk}/${tbl}-creation-log.txt
 bash create-dynamo-workflow-table.sh ${tbl} 1 1 &>> ${wrk}/${tbl}-creation-log.txt
-
-
 ```
 
 
