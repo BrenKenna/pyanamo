@@ -5,12 +5,16 @@ Code requires installing the Parallel and JQ software, as well as the *"dynamo-i
 
 
 ## Creating and Populating the Test Table
-The below code block executes a shell script which creates the workflow and uses the global secondary indexes as defined in the *"workflow-gsi.json"*. Although the current schema is largely for debugging purposes and will be used to try additional things, the *"nuts and bolts"* of it are below. Going forward the values of the *"lockID"* key will be in the format of *"locked_${ec2_instanceID} | done_${ec2_instanceID}"*. Additional fields for a *"Lock_Date"* and *"Done_Date"*
+The below code block executes a shell script which creates the workflow and uses the global secondary indexes as defined in the *"workflow-gsi.json"*. Although the current schema is largely for debugging purposes and will be used to try additional things, the *"nuts and bolts"* of it are below. Going forward the values of the *"lockID"* key will be in the format of *"locked_${ec2_instanceID} | done_${ec2_instanceID}"*. Additional fields for a *"Lock_Date"* and *"Done_Date"*.
 
 **i). itemID = Unique ID to identify an item on DynamoDB.**
+
 **ii). taskID = An ID which relates the itemID to the TaskScript, ex SampleIDs.**
+
 **iii). lockID = ID to manage conflicts with 3 possible values; todo, locked, done.**
+
 **iv). Log = Output from executing the TaskScript value.**
+
 **v). TaskScript = What LiAnamo-Beta will exeucte if the itemID is still available.**
 
 
@@ -57,6 +61,7 @@ done
 The below shows the results from the parallel execution test, where 3 applications that started at the same time iterated over the 10 test items. The results show that:
 
 **i). All parallel applications processed worked.**
+
 **ii). All tasks encountered and handled conflicts correctly.**
 
 ```bash
