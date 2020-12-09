@@ -39,7 +39,16 @@ bash create-dynamo-workflow-table.sh ${tbl} 1 1 &>> ${wrk}/${tbl}-creation-log.t
 ### Setup and Execute the Parallel Applications
 Since the production environment will have thousands of distinct applications querying the one table, we need to be sure that the therory holds-up. Since we already have our 10 test items in our workflow table, we will use those.
 
-For the test we are going to execute 3 parallel applications at the same time. In order for the test to be successful we expect that all 3 of the applications can detect Conflict Errors and that none of the 3 applications will execute the active TaskScript Keys value after flagging the conflict.
+For the test we are going to execute 3 parallel applications at the same time. In order for the test to be successful we expect that all 3 of the applications:
+
+
+**1. Can query the todo items. **
+
+**2. Can execute the task script. **
+
+**3. Can detect items already locked by another application (ie Raise Conflicts Errors). **
+
+**2. None of the 3 applications will execute the active TaskScript Keys value after raising a conflict error.**
 
 
 ```bash
