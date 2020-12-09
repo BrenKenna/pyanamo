@@ -42,13 +42,13 @@ Since the production environment will have thousands of distinct applications qu
 For the test we are going to execute 3 parallel applications at the same time. In order for the test to be successful we expect that all 3 of the applications:
 
 
-**1. Can query the todo items. **
+**1. Can query the todo items.**
 
-**2. Can execute the task script. **
+**2. Can execute the task script.**
 
-**3. Can detect items already locked by another application (ie Raise Conflicts Errors). **
+**3. Can detect items already locked by another application (ie Raise Conflicts Errors).**
 
-**2. None of the 3 applications will execute the active TaskScript Keys value after raising a conflict error.**
+**4. None of the 3 applications will execute the active TaskScript Keys value after raising a conflict error.**
 
 
 ```bash
