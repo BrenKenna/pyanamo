@@ -1,0 +1,25 @@
+{
+    "Item": {
+        "ID_Index": {
+            "N": "8"
+        }, 
+        "Log": {
+            "S": "NULL"
+        }, 
+        "tokenID": {
+            "S": "8-VC"
+        }, 
+        "lockID": {
+            "S": "19742"
+        }, 
+        "Workflow": {
+            "S": ""
+        }, 
+        "TaskScript": {
+            "S": "seq 17"
+        }, 
+        "taskID": {
+            "S": "NWD454905"
+        }
+    }
+}

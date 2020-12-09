@@ -1,0 +1,106 @@
+
+Proceeding with the HaplotypeCaller_Simul Workflow Table
+
+
+
+Fetching todo work for HaplotypeCaller_Simul with lockID = 15250
+
+
+Proceeding with 10 tasks
+
+
+Begining conflict check with item = 10-VC on lockID = 15250
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 15250 locked task seq 24 for item = 10-VC
+
+
+Task 10-VC complete, marking token as done
+
+
+Processing complete for item = 10-VC under lockID = 15250
+
+
+Begining conflict check with item = 1-VC on lockID = 15250
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 15250 locked task seq 16 for item = 1-VC
+
+
+Task 1-VC complete, marking token as done
+
+
+Processing complete for item = 1-VC under lockID = 15250
+
+
+Begining conflict check with item = 8-VC on lockID = 15250
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 3-VC on lockID = 15250
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 2-VC on lockID = 15250
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 15250 locked task seq 10 for item = 2-VC
+
+
+Task 2-VC complete, marking token as done
+
+
+Processing complete for item = 2-VC under lockID = 15250
+
+
+Begining conflict check with item = 9-VC on lockID = 15250
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 15250 locked task seq 17 for item = 9-VC
+
+
+Task 9-VC complete, marking token as done
+
+
+Processing complete for item = 9-VC under lockID = 15250
+
+
+Begining conflict check with item = 4-VC on lockID = 15250
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 6-VC on lockID = 15250
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 7-VC on lockID = 15250
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 5-VC on lockID = 15250
+
+
+Exiting, task is already locked by another process
+

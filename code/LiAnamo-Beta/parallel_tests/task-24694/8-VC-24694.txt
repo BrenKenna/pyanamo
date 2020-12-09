@@ -1,0 +1,25 @@
+{
+    "Item": {
+        "ID_Index": {
+            "N": "8"
+        }, 
+        "Log": {
+            "S": "Successful log = 8-VC,seq-18,'1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18'"
+        }, 
+        "tokenID": {
+            "S": "8-VC"
+        }, 
+        "lockID": {
+            "S": "done_28894"
+        }, 
+        "Workflow": {
+            "S": ""
+        }, 
+        "TaskScript": {
+            "S": "seq 18"
+        }, 
+        "taskID": {
+            "S": "NWD454905"
+        }
+    }
+}

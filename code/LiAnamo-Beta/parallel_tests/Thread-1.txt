@@ -1,0 +1,106 @@
+
+Proceeding with the HaplotypeCaller Workflow Table
+
+
+
+Fetching todo work for HaplotypeCaller with lockID = 19742
+
+
+Proceeding with 10 tasks
+
+
+Begining conflict check with item = 1-VC on lockID = 19742
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 19742 locked task seq 1 for item = 1-VC
+
+
+Task 1-VC complete, marking token as done
+
+
+Processing complete for item = 1-VC under lockID = 19742
+
+
+Begining conflict check with item = 3-VC on lockID = 19742
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 19742 locked task seq 14 for item = 3-VC
+
+
+Task 3-VC complete, marking token as done
+
+
+Processing complete for item = 3-VC under lockID = 19742
+
+
+Begining conflict check with item = 2-VC on lockID = 19742
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 5-VC on lockID = 19742
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 19742 locked task seq 6 for item = 5-VC
+
+
+Task 5-VC complete, marking token as done
+
+
+Processing complete for item = 5-VC under lockID = 19742
+
+
+Begining conflict check with item = 9-VC on lockID = 19742
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 8-VC on lockID = 19742
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 19742 locked task seq 17 for item = 8-VC
+
+
+Task 8-VC complete, marking token as done
+
+
+Processing complete for item = 8-VC under lockID = 19742
+
+
+Begining conflict check with item = 10-VC on lockID = 19742
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 7-VC on lockID = 19742
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 6-VC on lockID = 19742
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 4-VC on lockID = 19742
+
+
+Exiting, task is already locked by another process
+

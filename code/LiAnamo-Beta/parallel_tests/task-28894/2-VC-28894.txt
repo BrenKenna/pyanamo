@@ -1,0 +1,25 @@
+{
+    "Item": {
+        "ID_Index": {
+            "N": "2"
+        }, 
+        "Log": {
+            "S": "Successful log = 2-VC,seq-10,'1 2 3 4 5 6 7 8 9 10'"
+        }, 
+        "tokenID": {
+            "S": "2-VC"
+        }, 
+        "lockID": {
+            "S": "done_15250"
+        }, 
+        "Workflow": {
+            "S": ""
+        }, 
+        "TaskScript": {
+            "S": "seq 10"
+        }, 
+        "taskID": {
+            "S": "NWD900924"
+        }
+    }
+}

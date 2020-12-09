@@ -1,0 +1,259 @@
+
+Proceeding with the HaplotypeCaller_Simul Workflow Table
+
+
+
+Deleting input table HaplotypeCaller_Simul
+
+
+
+An error occurred (ResourceNotFoundException) when calling the DeleteTable operation: Requested resource not found: Table: HaplotypeCaller_Simul not found
+
+
+Creating input table HaplotypeCaller_Simul
+
+
+{
+    "TableDescription": {
+        "TableArn": "arn:aws:dynamodb:us-east-1:045566580068:table/HaplotypeCaller_Simul", 
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "ID_Index", 
+                "AttributeType": "N"
+            }, 
+            {
+                "AttributeName": "Log", 
+                "AttributeType": "S"
+            }, 
+            {
+                "AttributeName": "TaskScript", 
+                "AttributeType": "S"
+            }, 
+            {
+                "AttributeName": "WorkFlow", 
+                "AttributeType": "S"
+            }, 
+            {
+                "AttributeName": "lockID", 
+                "AttributeType": "S"
+            }, 
+            {
+                "AttributeName": "taskID", 
+                "AttributeType": "S"
+            }, 
+            {
+                "AttributeName": "tokenID", 
+                "AttributeType": "S"
+            }
+        ], 
+        "GlobalSecondaryIndexes": [
+            {
+                "IndexSizeBytes": 0, 
+                "IndexName": "WorkflowIndex", 
+                "Projection": {
+                    "ProjectionType": "ALL"
+                }, 
+                "ProvisionedThroughput": {
+                    "NumberOfDecreasesToday": 0, 
+                    "WriteCapacityUnits": 5, 
+                    "ReadCapacityUnits": 10
+                }, 
+                "IndexStatus": "CREATING", 
+                "KeySchema": [
+                    {
+                        "KeyType": "HASH", 
+                        "AttributeName": "TaskScript"
+                    }, 
+                    {
+                        "KeyType": "RANGE", 
+                        "AttributeName": "WorkFlow"
+                    }
+                ], 
+                "IndexArn": "arn:aws:dynamodb:us-east-1:045566580068:table/HaplotypeCaller_Simul/index/WorkflowIndex", 
+                "ItemCount": 0
+            }, 
+            {
+                "IndexSizeBytes": 0, 
+                "IndexName": "LoggingIndex", 
+                "Projection": {
+                    "ProjectionType": "ALL"
+                }, 
+                "ProvisionedThroughput": {
+                    "NumberOfDecreasesToday": 0, 
+                    "WriteCapacityUnits": 5, 
+                    "ReadCapacityUnits": 10
+                }, 
+                "IndexStatus": "CREATING", 
+                "KeySchema": [
+                    {
+                        "KeyType": "HASH", 
+                        "AttributeName": "lockID"
+                    }, 
+                    {
+                        "KeyType": "RANGE", 
+                        "AttributeName": "Log"
+                    }
+                ], 
+                "IndexArn": "arn:aws:dynamodb:us-east-1:045566580068:table/HaplotypeCaller_Simul/index/LoggingIndex", 
+                "ItemCount": 0
+            }, 
+            {
+                "IndexSizeBytes": 0, 
+                "IndexName": "TaskIndex", 
+                "Projection": {
+                    "ProjectionType": "ALL"
+                }, 
+                "ProvisionedThroughput": {
+                    "NumberOfDecreasesToday": 0, 
+                    "WriteCapacityUnits": 5, 
+                    "ReadCapacityUnits": 10
+                }, 
+                "IndexStatus": "CREATING", 
+                "KeySchema": [
+                    {
+                        "KeyType": "HASH", 
+                        "AttributeName": "taskID"
+                    }, 
+                    {
+                        "KeyType": "RANGE", 
+                        "AttributeName": "ID_Index"
+                    }
+                ], 
+                "IndexArn": "arn:aws:dynamodb:us-east-1:045566580068:table/HaplotypeCaller_Simul/index/TaskIndex", 
+                "ItemCount": 0
+            }
+        ], 
+        "ProvisionedThroughput": {
+            "NumberOfDecreasesToday": 0, 
+            "WriteCapacityUnits": 10, 
+            "ReadCapacityUnits": 10
+        }, 
+        "TableSizeBytes": 0, 
+        "TableName": "HaplotypeCaller_Simul", 
+        "TableStatus": "CREATING", 
+        "TableId": "0097f6f6-6681-47c0-b889-c4b8cefd886d", 
+        "KeySchema": [
+            {
+                "KeyType": "HASH", 
+                "AttributeName": "tokenID"
+            }
+        ], 
+        "ItemCount": 0, 
+        "CreationDateTime": 1607518610.57
+    }
+}
+
+
+Adding test items to input table HaplotypeCaller_Simul
+
+
+
+
+Adding test item 1-VC
+
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 3.0, 
+        "TableName": "HaplotypeCaller_Simul"
+    }
+}
+
+
+Adding test item 2-VC
+
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 3.0, 
+        "TableName": "HaplotypeCaller_Simul"
+    }
+}
+
+
+Adding test item 3-VC
+
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 3.0, 
+        "TableName": "HaplotypeCaller_Simul"
+    }
+}
+
+
+Adding test item 4-VC
+
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 3.0, 
+        "TableName": "HaplotypeCaller_Simul"
+    }
+}
+
+
+Adding test item 5-VC
+
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 3.0, 
+        "TableName": "HaplotypeCaller_Simul"
+    }
+}
+
+
+Adding test item 6-VC
+
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 3.0, 
+        "TableName": "HaplotypeCaller_Simul"
+    }
+}
+
+
+Adding test item 7-VC
+
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 3.0, 
+        "TableName": "HaplotypeCaller_Simul"
+    }
+}
+
+
+Adding test item 8-VC
+
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 3.0, 
+        "TableName": "HaplotypeCaller_Simul"
+    }
+}
+
+
+Adding test item 9-VC
+
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 3.0, 
+        "TableName": "HaplotypeCaller_Simul"
+    }
+}
+
+
+Adding test item 10-VC
+
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 3.0, 
+        "TableName": "HaplotypeCaller_Simul"
+    }
+}

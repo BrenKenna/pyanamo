@@ -1,0 +1,97 @@
+
+Proceeding with the HaplotypeCaller_Simul Workflow Table
+
+
+
+Fetching todo work for HaplotypeCaller_Simul with lockID = 28894
+
+
+Proceeding with 10 tasks
+
+
+Begining conflict check with item = 7-VC on lockID = 28894
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 28894 locked task seq 16 for item = 7-VC
+
+
+Task 7-VC complete, marking token as done
+
+
+Processing complete for item = 7-VC under lockID = 28894
+
+
+Begining conflict check with item = 8-VC on lockID = 28894
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 28894 locked task seq 18 for item = 8-VC
+
+
+Task 8-VC complete, marking token as done
+
+
+Processing complete for item = 8-VC under lockID = 28894
+
+
+Begining conflict check with item = 3-VC on lockID = 28894
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 4-VC on lockID = 28894
+
+
+Item still available, attempting lock procedure
+
+
+Current instance = 28894 locked task seq 17 for item = 4-VC
+
+
+Task 4-VC complete, marking token as done
+
+
+Processing complete for item = 4-VC under lockID = 28894
+
+
+Begining conflict check with item = 1-VC on lockID = 28894
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 2-VC on lockID = 28894
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 5-VC on lockID = 28894
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 6-VC on lockID = 28894
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 10-VC on lockID = 28894
+
+
+Exiting, task is already locked by another process
+
+
+Begining conflict check with item = 9-VC on lockID = 28894
+
+
+Exiting, task is already locked by another process
+
