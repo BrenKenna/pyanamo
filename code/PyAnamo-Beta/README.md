@@ -3,9 +3,9 @@ The overall principal of the LiAnamo code ported well onto python and can be use
 
 To Do / Open Questions:
 
-**i). Coorindate on a *"proper" task schema. **
+**i). Coorindate on a *"proper" task schema.**
 
-**ii). Coorindate on Provisioning. **
+**ii). Coorindate on Provisioning.**
 
 **iii). Add ec2-instance ID key.**
 
@@ -51,6 +51,7 @@ aws dynamodb create-table \
     --key-schema AttributeName=itemID,KeyType=HASH \
     --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=10 \
     --global-secondary-indexes file://${wrk}/workflow-gsi-index-2.json
+
 
 # Import the test data
 sleep 1m
@@ -151,7 +152,7 @@ grep -c "Attempting to process" pyanamo-gamma-thread*txt
 # grep "Attempting to process" pyanamo-gamma-thread*txt
 
 "
-- All items were queried, and threads 1 & 3 were very competitive with each other
+- All items were queried
 
 pyanamo-gamma-thread-1.txt:10
 pyanamo-gamma-thread-2.txt:10
@@ -164,8 +165,7 @@ grep -c "Conflict error on" pyanamo-gamma-thread*txt
 grep "Conflict error on" pyanamo-gamma-thread*txt
 
 "
-
-- Conflict errors were raised by all threads for all tokens
+- Conflict errors were raised by all threads for all items
 
 pyanamo-gamma-thread-1.txt:7
 pyanamo-gamma-thread-2.txt:5
