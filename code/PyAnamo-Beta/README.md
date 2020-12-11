@@ -1,9 +1,9 @@
 # PyAnamo-Beta
-The overall principal of the LiAnamo code ported well onto python and can be used to complete **Aim-1**, which will take the form of data generation of the SOD1 gene. Additionally it will also be nice to get a sense of running at scale provisioning budget.
+The overall principal of the LiAnamo code ported well onto python and can be used to complete ***Aim-1***, which will take the form of data generation of the SOD1 gene. Additionally it will also be nice to get a sense of running at scale provisioning budget.
 
 To Do / Open Questions:
 
-**i). Coorindate on a *"proper" task schema.**
+**i). Coorindate on a *"proper"* task schema.**
 
 **ii). Coorindate on Provisioning.**
 
