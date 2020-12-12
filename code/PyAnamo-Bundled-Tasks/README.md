@@ -6,7 +6,7 @@ ToDo:
 
 **i). Add querying functions to summarize table states.**
 
-**ii). Function to reset the lockID of a list itemIDs.**
+**ii). Function to reset the lockID of a list of itemIDs / query.**
 
 **iii). Change the Log_Length value to a dictionary instead of a list.**
 
@@ -50,7 +50,6 @@ aws dynamodb create-table \
     --key-schema AttributeName=itemID,KeyType=HASH \
     --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=10 \
     --global-secondary-indexes file://${wrk}/workflow-gsi-index-2.json
-
 
 
 # Import tasks: The final argument is to communicate whether to bundle tasks
