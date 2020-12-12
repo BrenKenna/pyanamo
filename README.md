@@ -1,14 +1,14 @@
 # PyAnamo
 
 ## Journals for Publication
-List of journals to publish the repoistory in, as well as a press release. Where Methods and Results section can be about the single instance and parallel instance test. As well as operating at scale with the HaplotypeCaller. Discussion section can be about the development ark etc
+List of journals to publish the repoistory in, as well as a press release. Where Methods and Results section can be about the single instance and parallel instance test. As well as operating at scale with the HaplotypeCaller. Discussion section can be about the development ark that during this time, as in LiAnamo (test concept) -> PyAnamo with Sub-Tasks
 
 ```bash
 1. Oxford Journal of Bioinformatics: 	https://academic.oup.com/bioinformatics
 
 2. Internation Journal of Data Science and Analytics: https://www.springer.com/journal/41060
 
-4. Journal of Big Data: https://journalofbigdata.springeropen.com/
+3. Journal of Big Data: https://journalofbigdata.springeropen.com/
 
 4. Big Data Research: https://www.journals.elsevier.com/big-data-research
 
