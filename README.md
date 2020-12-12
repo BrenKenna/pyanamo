@@ -1,4 +1,24 @@
 # PyAnamo
+
+## Journals for Publication
+List of journals to publish the repoistory in, as well as a press release. Where Methods and Results section can be about the single instance and parallel instance test. As well as operating at scale with the HaplotypeCaller. Discussion section can be about the development ark etc
+
+```bash
+1. Oxford Journal of Bioinformatics: 	https://academic.oup.com/bioinformatics
+
+2. Internation Journal of Data Science and Analytics: https://www.springer.com/journal/41060
+
+4. Journal of Big Data: https://journalofbigdata.springeropen.com/
+
+4. Big Data Research: https://www.journals.elsevier.com/big-data-research
+
+5. Big Data: https://home.liebertpub.com/publications/big-data/611/overview
+
+Press Release: https://towardsdatascience.com
+```
+
+
+## Introduction
 The purpose of *PyAnamo* is to automate "Big Data" *'Extraction Transformation and Loading'* procedures, ETLs, on AWS using EC2 &amp; DynamoDB. The principal of operation is that each requested EC2 instance executes an application that iterates over a list of work to do, *tasks*, which are stored in a database. The database is populated with various collections of tasks that represent all of the work to do from your favourite workflow. Where each individual *collection* is a step of your workflow. The database can then be queried to monitor progress of each step of the workflow.
 
 In the **current PiCaS + couchDB setup**, each task for a given collection, has a *"Task Script"* key whose value is executed by a *Generic PiCaS Application*. The setup allows for each instance of the application, running across the cluster of size N, to iteratively execute *'Program A'* on all tasks in the collection of *'Workflow Step A'*. The application could also be potentially ported into existing setups at the users own discretion, ex 'https://doi.org/10.1093/bioinformatics/btz379'.
