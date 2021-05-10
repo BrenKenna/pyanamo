@@ -1,3 +1,0 @@
-sleep 3s; bash /home/ec2-user/dynamo-iterator.sh HaplotypeCaller &>> /home/ec2-user/parallel_tests/Thread-1.txt
-sleep 4s; bash /home/ec2-user/dynamo-iterator.sh HaplotypeCaller &>> /home/ec2-user/parallel_tests/Thread-2.txt
-sleep 4s; bash /home/ec2-user/dynamo-iterator.sh HaplotypeCaller &>> /home/ec2-user/parallel_tests/Thread-3.txt
