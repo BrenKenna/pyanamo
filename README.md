@@ -68,7 +68,6 @@ python pyanamo.py -t "${PYANAMO_TABLE}" -b "${S3_BUCKET}" -r "${AWS_REGION}"
 
 
 # Run pyanamo: Parallel N as options
-cd ${PYANAMO}/class-based/inheritance
 python pyanamo.py -t "${PYANAMO_TABLE}" -b "${S3_BUCKET}" -r "${AWS_REGION}" -i '2' -n '4'
 ```
 
