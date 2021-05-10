@@ -14,11 +14,10 @@ The combination of a super simple **'Start a Cluster of HaplotypeCaller or Seque
 
 
 # Example
-The current example was developed from some *'Free Tier'* work on AWS, and we are currently *very excited* to be porting this onto a **DynamoDB back-end** instead of couchDB backend *(overall principal is the same)*. The example consits of two steps:
 
-**1). Create a to do task and store in DB**.
+**1). Create some to do tasks and store in a DynamoDB Table**.
 
-**2). Startup a pipeline step specific cluster**.
+**2). Run PyAnamo to fetch all and process these tasks**.
 
 **NB: The example assumes AWS and DynamoDB are setup for your account**.
 
@@ -60,7 +59,7 @@ python import-items-generic.py -t ${PYANAMO_TABLE} -d ${PYANAMO_TABLE}-import.tx
 ```
 # Run pyanamo: Non-parallel
 export PYANAMO=Path/to/where/git/was/downloaded
-export PYANAMO_TABLE="Testing"
+export PYANAMO_TABLE="My_Super_Fun_Happy_Table"
 S3_BUCKET=SomeName
 AWS_REGION=us-east-1
 python pyanamo.py -t "${PYANAMO_TABLE}" -b "${S3_BUCKET}" -r "${AWS_REGION}"
