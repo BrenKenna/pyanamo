@@ -31,7 +31,7 @@ The current example was developed from some *'Free Tier'* work on AWS, and we ar
 # Create table		<= Add to client
 export PYANAMO=Path/to/where/git/was/downloaded
 export PYANAMO_TABLE="Testing"
-mkdir -p ${wrk}/Testing
+cd ${PYANAMO}
 aws dynamodb create-table \
 	--table-name "${PYANAMO_TABLE}" \
 	--attribute-definitions AttributeName=itemID,AttributeType=N AttributeName=ItemState,AttributeType=S AttributeName=taskID,AttributeType=S AttributeName=InstanceID,AttributeType=S AttributeName=Log_Length,AttributeType=N \
@@ -43,13 +43,12 @@ aws dynamodb create-table \
 # Create some test tasks
 for i in {1..16}
 	do
-	echo -e "Task-${i}|Testing|seq|${i},2,3"
-done > ${wrk}/Testing/import.txt
-cd ${PYANAMO}
+	echo -e "Task-${i}|${PYANAMO_TABLE}|seq|${i},2,3"
+done > ${PYANAMO_TABLE}-import.txt
 
 
 # Import each of the 16 items as nested tasks: seq ${i}, seq 1, seq 2, seq 3
-python import-items-generic.py -t Testing -d ${wrk}/Testing/import.txt -s "|" -n ','
+python import-items-generic.py -t ${PYANAMO_TABLE} -d ${PYANAMO_TABLE}-import.txt -s "|" -n ','
 
 
 ```
