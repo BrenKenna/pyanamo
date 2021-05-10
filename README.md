@@ -1,22 +1,5 @@
 # PyAnamo
 
-## Journals for Publication
-List of journals to publish the repoistory in, as well as a press release. Where Methods and Results section can be about the single instance and parallel instance test. As well as operating at scale with the HaplotypeCaller. Discussion section can be about the development ark that during this time, as in LiAnamo (test concept) -> PyAnamo with Sub-Tasks
-
-```bash
-1. Oxford Journal of Bioinformatics: 	https://academic.oup.com/bioinformatics
-
-2. Internation Journal of Data Science and Analytics: https://www.springer.com/journal/41060
-
-3. Journal of Big Data: https://journalofbigdata.springeropen.com/
-
-4. Big Data Research: https://www.journals.elsevier.com/big-data-research
-
-5. Big Data: https://home.liebertpub.com/publications/big-data/611/overview
-
-Press Release: https://towardsdatascience.com
-```
-
 
 ## Introduction
 The purpose of *PyAnamo* is to automate "Big Data" *'Extraction Transformation and Loading'* procedures, ETLs, on AWS using EC2 &amp; DynamoDB. The principal of operation is that each requested EC2 instance executes an application that iterates over a list of work to do, *tasks*, which are stored in a database. The database is populated with various collections of tasks that represent all of the work to do from your favourite workflow. Where each individual *collection* is a step of your workflow. The database can then be queried to monitor progress of each step of the workflow.
@@ -37,38 +20,59 @@ The current example was developed from some *'Free Tier'* work on AWS, and we ar
 
 **2). Startup a pipeline step specific cluster**.
 
-**NB: The example assumes AWS, DynamoDB and dbGaP authorization, alongside an AMI + an EC2 launch template (named by step in workflow)**.
+**NB: The example assumes AWS and DynamoDB are setup for your account**.
 
 
 
-## Create tokens
+## Create tasks
 
-```python
-view = "Testing"
-taskScript = """sleep 5s"""
-credentials.VIEW_NAME = view
-db = couchdb.Database(credentials.URL + "/" + credentials.DBNAME)
-db.resource.credentials = (credentials.USERNAME, credentials.PASS)
 
-for i in range(0,9):
-	tokenname = str( "SuperAwesome_Token_" + str(round(random() * 200)) + "_Testing")
-	if tokenname in db:
-		print("Skipping " + tokenname)
-	else:
-		token = {"_id": tokenname, "lock": 0, "done": 0, "type": view, "files": 'doggie', "Task_ID": tokenname, "Task_Script": taskScript}
-		db.save(token)
+```
+# Create table		<= Add to client
+export PYANAMO=Path/to/where/git/was/downloaded
+export PYANAMO_TABLE="Testing"
+mkdir -p ${wrk}/Testing
+aws dynamodb create-table \
+	--table-name "${PYANAMO_TABLE}" \
+	--attribute-definitions AttributeName=itemID,AttributeType=N AttributeName=ItemState,AttributeType=S AttributeName=taskID,AttributeType=S AttributeName=InstanceID,AttributeType=S AttributeName=Log_Length,AttributeType=N \
+	--key-schema AttributeName=itemID,KeyType=HASH \
+	--provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=10 \
+	--global-secondary-indexes file://${PYANAMO}/workflow-gsi-index.json
+
+
+# Create some test tasks
+for i in {1..16}
+	do
+	echo -e "Task-${i}|Testing|seq|${i},2,3"
+done > ${wrk}/Testing/import.txt
+cd ${PYANAMO}
+
+
+# Import each of the 16 items as nested tasks: seq ${i}, seq 1, seq 2, seq 3
+python import-items-generic.py -t Testing -d ${wrk}/Testing/import.txt -s "|" -n ','
+
+
 ```
 
 
-## Execute application locally
-```bash
-python PiCaS-General.py ${VIEW_NAME}
+## Run PyAnamo
+
+
+```
+# Run pyanamo: Non-parallel
+export PYANAMO=Path/to/where/git/was/downloaded
+export PYANAMO_TABLE="Testing"
+S3_BUCKET=SomeName
+AWS_REGION=us-east-1
+python pyanamo.py -t "${PYANAMO_TABLE}" -b "${S3_BUCKET}" -r "${AWS_REGION}"
+
+
+
+# Run pyanamo: Parallel N as options
+cd ${PYANAMO}/class-based/inheritance
+python pyanamo.py -t "${PYANAMO_TABLE}" -b "${S3_BUCKET}" -r "${AWS_REGION}" -i '2' -n '4'
 ```
 
 
-## Start Cluster to Run the Pipeline
-Run the below to start your cluster, note that by naming your EC2 launch template you can retrive the active instanceIDs *'Name'* within the *'User-Data Script'*. Which allows the script to know which pipeline to start ploughing through, meaning less scripts and code. The world is also your oyster for fail safes that you can add to prevent wasted hours on *EC2 Spot Instances*, ex *terminating the active instanceID* if the *application* that iterates over the DB *fails* or *does not have read/write permissions* to the pipelines results S3 directory. You can also set the *Njobs variable*, so that the *number of active EC2 instances < Number of tasks in workflow* step; X, Y, Z. And finally, you can also open out cluster monitoring on the instance level by storing the output of *'aws ec2 run-instances'* in text file or an *SQLite DB* if your super hardcore :).
 
-```bash
-aws ec2 run-instances --count ${Njobs} --user-data file://~/custom-pipeline/EC2-Fetch-Run.sh --launch-template "LaunchTemplateName=${Workflow}" > instance-data-${Njobs}.txt
-```
+
