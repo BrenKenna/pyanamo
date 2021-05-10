@@ -28,7 +28,7 @@ Adding another layer of complextity, is that fact the lists of all these various
 ```
 # Create table		<= Add to client
 export PYANAMO=Path/to/where/git/was/downloaded
-export PYANAMO_TABLE="Testing"
+export PYANAMO_TABLE="My_Super_Fun_Happy_Table"
 cd ${PYANAMO}
 aws dynamodb create-table \
 	--table-name "${PYANAMO_TABLE}" \
