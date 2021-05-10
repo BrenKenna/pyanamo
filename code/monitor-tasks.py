@@ -1,5 +1,8 @@
 #!/usr/bin/python3
-
+# 
+# - Make part of client?
+# 
+# 
 
 # Import modules
 import argparse, boto3, random, string, time, sys, os, string, json, gzip

@@ -1,5 +1,7 @@
 #!/usr/bin/python
-
+# 
+# - Merge with parallel runner
+# 
 
 # Import modules
 import boto3, time, string, random, re, os, time, sys, json, gzip

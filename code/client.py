@@ -1,5 +1,10 @@
 #!/usr/bin/python
-
+# 
+# - Drop non-implemented functions
+# - Add method for setting provisions (auto-scaling etc)
+# - Add method for importing single and nested items
+# - Add method for creating table with PyAnamo schema
+# 
 
 # Import modules
 import boto3, random

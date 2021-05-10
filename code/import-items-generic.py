@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+# 
+# Add methods + table creation to client class
+# 	-> Leave this script as an implementor
+# 
 
 
 # Import modules
