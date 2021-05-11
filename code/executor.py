@@ -219,7 +219,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 		"""
 
 		# Handle logs: Maybe just give the updateItem function the data object to handle
-		itemID = int(taskData['itemID'])
+		itemID = str(taskData['itemID'])
 		taskID = taskData['taskID']
 		data = self.handleLogs(taskLog["Log"]["stdout"] + taskLog["Log"]["stderr"], table_name, instanceID, taskID, s3Bucket)
 
@@ -251,7 +251,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 		"""
 
 		# Handle logs: Maybe just give the updateItem function the data object to handle
-		itemID = int(nested_Data['itemID'])
+		itemID = str(nested_Data['itemID'])
 		taskID = nested_Data['taskID']
 		del nested_Data['itemID'], nested_Data['taskID']
 		nestedID = nested_Data['nestedID']

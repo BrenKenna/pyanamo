@@ -498,12 +498,10 @@ def importItemsBundled(tbl, counter, data, separator, nested_delim):
 		for i in range(0, len(taskArgs)):
 			task = { str("Task_" + str(i)): { "Status": 'todo', "Script": str(taskScript + ' ' + taskArgs[i]) } }
 			tasks.update(task)
-		# tasks = json.dumps(tasks)
-
 
 		# Import item
 		item = {
-			"itemID": counter,
+			"itemID": str(counter),
 			"taskID": str(taskID),
 			"InstanceID": 'NULL',
 			"TaskScript": tasks,

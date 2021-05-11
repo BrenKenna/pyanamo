@@ -55,9 +55,9 @@ group.add_argument("-q", "--quiet", action = "store_true")
 
 # Arguments for code
 parser.add_argument("-t", "--table_name", action = 'store', type = str, help = "DynamoDB table to query\n")
-parser.add_argument("-r", "--aws_region", action = 'store', type = str, help = "AWS region that the dynamo table is in \n")
+parser.add_argument("-r", "--aws_region", action = 'store', type = str, help = "AWS region that the dynamo table is in\n")
 parser.add_argument("-b", "--bucket", action = 'store', type = str, help = "S3 Bucket for logs >1GB\n")
-parser.add_argument("-k", "--bucket_Key", action = 'store', type = str, help = "S3 Bucket key for logs >1GB\n")
+parser.add_argument("-k", "--bucket_Key", action = 'store', type = str, help = "Path on the S3 bucket for PyAnamo to put gzip compressed log files\n")
 parser.add_argument("-i", "--parallel_items", action = 'store', type = int, help = "Optional Argument: Number of parallel processes to fetch todo items\n")
 parser.add_argument("-n", "--parallel_nests", action = 'store', type = int, help = "Optional Argument: Number of parallel processes to act on nested items\n")
 args = parser.parse_args()

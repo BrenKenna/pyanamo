@@ -1,10 +1,5 @@
 #!/usr/bin/python
-# 
-# - Drop non-implemented functions
-# - Add method for setting provisions (auto-scaling etc)
-# - Add method for importing single and nested items
-# - Add method for creating table with PyAnamo schema
-# 
+
 
 # Import modules
 import boto3, random
@@ -167,26 +162,6 @@ class PyAnamo_Client():
 			currentState = self.recursiveGet(self.dynamo_table, query_kwargs, 'query')[0]
 		
 		return(currentState)
-
-
-	# Put dict
-	def putItem(self, item):
-		"""
-			Put the supplied item into the DyanmoDB client table
-			!!!! Under Development Ignore !!!!
-		"""
-		response = table.put_item(Item = item, ReturnConsumedCapacity = 'TOTAL')
-		return(response)
-
-
-	# Update item
-	def updateItem(self, update_kwargs):
-		"""
-			Update the supplied item in the DyanmoDB client table
-			!!!! Under Development Ignore !!!!
-		"""
-		response = self.dynamo_table.update_item(update_kwargs)
-		return(response)
 
 
 	# Item counter

@@ -192,7 +192,7 @@ class PyAnamo_Modifier(pc.PyAnamo_Client):
 			# Execute update for setting done
 			now = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
 			response = self.dynamo_table.update_item(
-				Key = {'itemID': int(itemID)},
+				Key = {'itemID': str(itemID)},
 				ExpressionAttributeNames = {
 					"#lock": "ItemState",
 					"#DateDone": "Done_Date"

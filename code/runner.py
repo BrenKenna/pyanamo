@@ -101,7 +101,7 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 			taskScript[task]['Status'] = "done"
 			todo_item['Log_Length'] += 1
 			nested_Data = {
-				"itemID": int(itemID),
+				"itemID": str(itemID),
 				"taskID": taskID,
 				"nestedID": task,
 				"Log_Length": todo_item["Log_Length"],
