@@ -24,8 +24,8 @@ def parallel_items(aws_kwargs):
 	dynamodb = boto3.resource('dynamodb', region_name = aws_kwargs['region'])
 	table = dynamodb.Table(aws_kwargs['dynamo_table'])
 
-	# Instatiate PyAnamo runner
-	pyanamoRunner = runner.PyAnamo_Runner(table, aws_kwargs['s3_key'], Parallel_Nests = aws_kwargs['nests'], todoDict = 'get')
+	# Instatiate PyAnamo runner: dynamo_table, s3Bucket = None, Parallel_Nests = 0, aws_region = None, todoDict = None
+	pyanamoRunner = runner.PyAnamo_Runner(table, aws_kwargs['s3_key'], Parallel_Nests = aws_kwargs['nests'], aws_region = aws_kwargs['region'], todoDict = 'get')
 	logging = pyanamoRunner.processItems()
 	return(logging)
 

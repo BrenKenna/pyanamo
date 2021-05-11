@@ -1,8 +1,5 @@
 #!/usr/bin/python
-# 
-# - Leave this script here and move classes to 'worker/'
-# 
-# 
+
 
 ####################################################
 ####################################################
@@ -140,5 +137,5 @@ else:
 
 	# Instatiate PyAnamo runner
 	sys.stdout.write('\nExecuting PyAnamo Runner\n')
-	pyanamoRunner = runner.PyAnamo_Runner(table, s3Bucket, todoDict = 'get')
+	pyanamoRunner = runner.PyAnamo_Runner(table, s3Bucket, Parallel_Nests = parallel_nests, aws_region = aws_region, todoDict = 'get')
 	logging = pyanamoRunner.processItems()

@@ -1,7 +1,5 @@
 #!/usr/bin/python
-# 
-# - Merge with parallel runner
-# 
+
 
 # Import modules
 import boto3, time, string, random, re, os, time, sys, json, gzip
@@ -24,12 +22,13 @@ def parallel_nested(todo_item):
 
 
 	# Setup dynamo session for table
-	dynamodb = boto3.resource('dynamodb', region_name = 'us-east-1')
-	table = dynamodb.Table('Testing')
+	aws_kwargs = todo_item['aws_kwargs']
+	dynamodb = boto3.resource('dynamodb', region_name = aws_kwargs['region'])
+	table = dynamodb.Table(aws_kwargs['dynamo_table'])
 
 
 	# Instantiate PyAnamo Runner without getting new todoDict
-	pyanamoRunner = runner.PyAnamo_Runner(table, 'bkennatesting')
+	pyanamoRunner = runner.PyAnamo_Runner(table, aws_kwargs['s3_key'])
 	pyanamoRunner.handleNestedItem(todo_item)
 
 
@@ -51,7 +50,7 @@ class PyAnamo_ProcessPool(mp.pool.Pool):
 
 
 # Nested items
-def nested_items(nested_item, Nprocesses):
+def nested_items(nested_item, Nprocesses, aws_kwargs):
 
 	# Initialize multiprocessing pools: N or mp.cpu_count()
 	availableThreads = mp.cpu_count()
@@ -70,6 +69,7 @@ def nested_items(nested_item, Nprocesses):
 		for todoKey in nested_item.keys():
 			data.update( {todoKey: nested_item[todoKey]} )
 			data['TaskScript'] = {}
+			data.update( {'aws_kwargs': aws_kwargs} )
 
 			# Add the nested task data to the appropriate task script
 			for task in chunk:
@@ -86,13 +86,13 @@ def nested_items(nested_item, Nprocesses):
 
 
 # Run
-def main(Nprocesses, nested_item = None):
+def main(Nprocesses, aws_kwargs = None, nested_item = None):
 
 	# Run parallel_items
 	if nested_item != None and Nprocesses > 1:
 
 		# Call nested item function
-		nested_items(nested_item, Nprocesses)
+		nested_items(nested_item, Nprocesses, aws_kwargs)
 
 	# Otherwise exit
 	else:

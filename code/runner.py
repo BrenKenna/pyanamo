@@ -21,14 +21,21 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 	"""
 
 	# Initialize
-	def __init__(self, dynamo_table, s3Bucket = None, Parallel_Nests = 0, todoDict = None):
+	def __init__(self, dynamo_table, s3Bucket = None, Parallel_Nests = 0, aws_region = None, todoDict = None):
 		super(PyAnamo_Runner, self)
 		self.dynamo_table = dynamo_table
 		self.s3Bucket = s3Bucket
+		self.aws_region = aws_region
+		self.Parallel_Nests = Parallel_Nests
 		self.table_name = dynamo_table.name
+		self.aws_kwargs = {
+				"region": self.aws_region,
+				"s3_key": self.s3Bucket,
+				"nested_parallel": self.Parallel_Nests,
+				"dynamo_table": self.table_name
+			}
 		self.lockStreak = 0
 		self.instanceID = self.getInstanceID()
-		self.Parallel_Nests = Parallel_Nests
 
 		# Handle instantition outside of main process (nested item parallelization)
 		if todoDict == None:
@@ -137,7 +144,7 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 
 						# Process the item as nested: 
 						print("Parallel processing active task as nested item")
-						parallelize_nested.main(self.Parallel_Nests, nested_item = todo_item)
+						parallelize_nested.main(self.Parallel_Nests, aws_kwargs = self.aws_kwargs, nested_item = todo_item)
 						self.updateNestedItem(itemID)
 						print('\nExecution successful, updating itemID = ' + str(itemID) + ' as done')
 
