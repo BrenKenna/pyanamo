@@ -15,9 +15,9 @@ import multiprocessing as mp
 def parallel_items(aws_kwargs):
 
 	# Stagger start times of current process
-	N = float(random.randint(1, 30) / 100)
-	N_2 = float(random.randint(1, 20) / 100)
-	N_3 = float(random.randint(1, 10) / 100)
+	N = float(random.randint(10, 40) / 100)
+	N_2 = float(random.randint(10, 30) / 100)
+	N_3 = float(random.randint(1, 15) / 100)
 	time.sleep(N + N_2 + N_3)
 
 	# Setup
@@ -64,7 +64,6 @@ def single_items(aws_kwargs, Nprocesses, Nested_Processes = 0):
 			work.append(aws_kwargs)
 
 		# Run
-		pool.__dict__
 		pool.map(parallel_items, work)
 		pool.close()
 		pool.join()

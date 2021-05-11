@@ -15,9 +15,9 @@ import multiprocessing as mp
 def parallel_nested(todo_item):
 
 	# Stagger start times of current process
-	N = float(random.randint(1, 30) / 100)
-	N_2 = float(random.randint(1, 20) / 100)
-	N_3 = float(random.randint(1, 10) / 100)
+	N = float(random.randint(10, 40) / 100)
+	N_2 = float(random.randint(10, 30) / 100)
+	N_3 = float(random.randint(1, 15) / 100)
 	time.sleep(N + N_2 + N_3)
 
 
@@ -56,8 +56,16 @@ def nested_items(nested_item, Nprocesses, aws_kwargs):
 	availableThreads = mp.cpu_count()
 	pool = PyAnamo_ProcessPool(Nprocesses)
 
-	# Split list across N chunks
-	chunks = [ list(nested_item['TaskScript'].keys())[i:i+Nprocesses] for i in range(0, len(nested_item['TaskScript'].keys()), Nprocesses) ]
+	# Handle tasks per process
+	taskPerProcess = int(len(nested_item['TaskScript'].keys()) / Nprocesses)
+	if taskPerProcess == 0:
+		Nprocesses = len(nested_item['TaskScript'].keys())
+		taskPerProcess = int(len(nested_item['TaskScript'].keys()) / Nprocesses)
+		print('\nUpdated parallel process pool N = ' + str(taskPerProcess) + ' tasks per N = ' + str(Nprocesses) + ' processes\n')
+
+
+	# Distribute work todo per process
+	chunks = [ list(nested_item['TaskScript'].keys())[i:i + taskPerProcess] for i in range(0, len(nested_item['TaskScript'].keys()), taskPerProcess) ]
 
 
 	# Compose todo_item dicts for each parallel pool

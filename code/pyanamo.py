@@ -97,7 +97,7 @@ if args.parallel_nests == None or args.parallel_nests == 1:
 
 else:
 	parallel_nests = args.parallel_nests
-	sys.stdout.write('\nRunning ' + str(parallel_nests) + ' to processes nested items\n')
+	sys.stdout.write('\nRunning ' + str(parallel_nests) + ' processes for nested items\n')
 
 del parser, argparse
 
