@@ -54,6 +54,9 @@ def nested_items(nested_item, Nprocesses, aws_kwargs):
 
 	# Initialize multiprocessing pools: N or mp.cpu_count()
 	availableThreads = mp.cpu_count()
+	if Nprocesses > availableThreads:
+		Nprocesses = availableThreads
+
 	pool = PyAnamo_ProcessPool(Nprocesses)
 
 	# Handle tasks per process

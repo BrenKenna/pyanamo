@@ -52,6 +52,8 @@ def single_items(aws_kwargs, Nprocesses, Nested_Processes = 0):
 
 	# Initialize multiprocessing pools: N or mp.cpu_count()
 	availableThreads = mp.cpu_count()
+	if Nprocesses > availableThreads:
+		Nprocesses = availableThreads
 	pool = PyAnamo_ProcessPool(Nprocesses)
 	aws_kwargs.update( {'nests': Nested_Processes} )
 
