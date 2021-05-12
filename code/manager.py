@@ -155,9 +155,6 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 	# Delete workflow table
 	def delete_workflow_table(self, table_name):
 
-		# Handle table object
-		handle_DynamoTable(self, table_name)
-
 		# Delete table if exists
 		table_exists = self.check_table(table_name)
 		if table_exists == 1:
