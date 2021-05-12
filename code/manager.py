@@ -82,7 +82,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			response = dynamodb_client.describe_table(TableName = table_name)
 			out = 1
 
-			# Handle
+			# Handle whether to return table schema
 			if 'Table' in response and output_schema != None:
 				out = response['Table']
 
