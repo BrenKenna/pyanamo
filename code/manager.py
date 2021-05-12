@@ -16,15 +16,23 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 		The PyAnamo_Manager includes methods to:
 			# Create / Remove workflow table (Manager)
 			# Describe the workflow table schema (Manager)
-			- Set dynamo_table property
+			# Set dynamo_table property
 			- Alter table provisioning and set auto-scaling (Manager)
-			- Check whether specific items do or do not exist (Manager + Client-getCurrentState)
+			# Check whether specific items do or do not exist (Manager + Client-getCurrentState)
 			- Import task, list or text file of tasks to table (Manager)
 			# Summarize the PyAnamo item states (optionally over-time) (Manager + Client-itemCounter)
-			- Change item states (optionally user-defined string (Manager + Client)
+			- Monitor nested tasks: {
+					0% / todo: { N, [] },
+					1-25%: { N, [] },
+					26-49%: { N, [] },
+					50-74%: { N, [] },
+					75-99%: { N, [] },
+					100% / done: { N, [] }
+			}
+			# Change item states (optionally user-defined string (Manager + Client)
 			- Retrieve item logs, instanceIDs (Manager + Client-getToDoItems)
 			- Translate itemStates to AWS-Batch job states (Manager + Client)
-			- Unlock / Restart tasks (Manager)
+			# Unlock / Restart tasks (Manager)
 			- Unlock specific nested tasks within specific items (Manager)
 			- Delete specific items (Manager)
 			- Template for managing custom priority queue (itemStates + monitoring over time) (Manager + Client)
@@ -82,7 +90,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			response = dynamodb_client.describe_table(TableName = table_name)
 			out = 1
 
-			# Handle whether to return table schema
+			# Handle
 			if 'Table' in response and output_schema != None:
 				out = response['Table']
 
@@ -175,7 +183,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 	def monitor_task(self, table_name, Niterations = 1, waitTime = 0):
 
 		# Handle table object
-		handle_DynamoTable(self, table_name)
+		self.handle_DynamoTable(self, table_name)
 
 		# Run item counter for N iterations, with wait time between them		
 		N = 0
@@ -205,7 +213,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 	def updateItemStates(self, table_name, itemID_list, itemState):
 
 		# Iteratively update the list of items to itemState
-		handle_DynamoTable(self, table_name)
+		self.handle_DynamoTable(self, table_name)
 		counter = 0
 		failedItems = []
 		for itemID in itemID_list:
