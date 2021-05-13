@@ -19,7 +19,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			# Set dynamo_table property
 			- Alter table provisioning and set auto-scaling (Manager)
 			# Check whether specific items do or do not exist (Manager + Client-getCurrentState)
-			- Import task, list or text file of tasks to table (Manager)
+			# Import task, list or text file of tasks to table (Manager)
 			# Summarize the PyAnamo item states (optionally over-time) (Manager + Client-itemCounter)
 			- Monitor nested tasks: {
 					0% / todo: { N, [] },
@@ -364,4 +364,89 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 
 			# Return out
+			return(out)
+
+
+	# Restart items
+	def reset_itemState(self, table_name = None, itemState = None, item = []):
+
+		# Handle arguments
+		if table_name is None or itemState is None or item == []:
+			print('Error, please provide table_name, an item / item list and a state to set items')
+
+
+		# Otherwise proceed
+		else:
+
+			# Update the list of items
+			self.handle_DynamoTable(table_name)
+			if type(item) is list:
+
+				# Try setting item states
+				out = {'N': 0, 'Updated': [], 'Failed': []}
+				for itemID in item:
+					out['N'] += 1
+					try:
+						response = self.dynamo_table.update_item(
+							Key = {'itemID': str(itemID)},
+							ExpressionAttributeNames = {
+								"#lock": "lockID",
+								"#state": "ItemState",
+								"#DateLock": 'Lock_Date',
+								"#DateDone": 'Done_Date',
+								"#InstanceID": 'InstanceID',
+								"#Logging": 'Log',
+								"#Log_Len": 'Log_Length'
+							},
+							ExpressionAttributeValues = {
+								":lockingID": "NULL",
+								":dateLock": "NULL",
+								":instanceID": "NULL",
+								":itemstate": str(itemState),
+								":logging": {},
+								":dateDone": "NULL",
+								":log_len": int(0)
+							},
+							UpdateExpression="SET #lock = :lockingID, #state = :itemstate, #DateLock = :dateLock, #DateDone = :dateDone, #InstanceID = :instanceID, #Logging = :logging, #Log_Len = :log_len",								
+							ReturnValues="UPDATED_NEW"
+						)
+						out['Updated'].append(str(itemID))
+
+					# Otherwise add to failed
+					except:
+						out['Failed'].append(str(itemID))
+
+			# Otherwise update the supplied item
+			else:
+				try:
+					response = self.dynamo_table.update_item(
+						Key = {'itemID': str(item)},
+						ExpressionAttributeNames = {
+							"#lock": "lockID",
+							"#state": "ItemState",
+							"#DateLock": 'Lock_Date',
+							"#DateDone": 'Done_Date',
+							"#InstanceID": 'InstanceID',
+							"#Logging": 'Log',
+							"#Log_Len": 'Log_Length'
+						},
+						ExpressionAttributeValues = {
+							":lockingID": "NULL",
+							":dateLock": "NULL",
+							":instanceID": "NULL",
+							":itemstate": str(itemState),
+							":logging": {},
+							":dateDone": "NULL",
+							":log_len": int(0)
+						},
+						UpdateExpression="SET #lock = :lockingID, #state = :itemstate, #DateLock = :dateLock, #DateDone = :dateDone, #InstanceID = :instanceID, #Logging = :logging, #Log_Len = :log_len",
+						ReturnValues="UPDATED_NEW"
+					)
+					out = str('Updated item = ' + item)
+
+				# Otherwise add to failed
+				except:
+					out = str('Error updating item = ' + item)
+
+			# Return out 
 			return(out)
