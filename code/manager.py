@@ -42,6 +42,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 	def __init__(self, dynamo_table = None, region = None):
 
 		# Dynamo
+		self.region = region
 		if type(dynamo_table) is str:
 			self.dynamodb = boto3.resource('dynamodb', region_name = region)
 
@@ -131,7 +132,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			{ 'AttributeName': "ItemState", "AttributeType": "S" },
 			{ 'AttributeName': "taskID", "AttributeType": "S" },
 			{ 'AttributeName': "InstanceID", "AttributeType": "S" },
-			{ 'AttributeName': "Log_Length", "AttributeType": "S" }
+			{ 'AttributeName': "Log_Length", "AttributeType": "N" }
 		]
 		table_Provisioning = { 'ReadCapacityUnits': 10, 'WriteCapacityUnits': 10 }
 
@@ -166,8 +167,8 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 		# Delete table if exists
 		table_exists = self.check_table(table_name)
 		if table_exists == 1:
-			table = self.dynamodb.Table(table_name)
-			table.delete()
+			self.handle_DynamoTable(table_name)
+			self.dynamo_table.delete()
 			time.sleep(int(10))
 			out = int(1)
 			print('Table = ' + table_name + ' deleted')
@@ -183,7 +184,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 	def monitor_task(self, table_name, Niterations = 1, waitTime = 0):
 
 		# Handle table object
-		self.handle_DynamoTable(self, table_name)
+		self.handle_DynamoTable(table_name)
 
 		# Run item counter for N iterations, with wait time between them		
 		N = 0
@@ -213,7 +214,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 	def updateItemStates(self, table_name, itemID_list, itemState):
 
 		# Iteratively update the list of items to itemState
-		self.handle_DynamoTable(self, table_name)
+		self.handle_DynamoTable(table_name)
 		counter = 0
 		failedItems = []
 		for itemID in itemID_list:
@@ -234,3 +235,133 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 		# Log status
 		print('Successfully update N = ' + str(counter) + " items to state = " + itemState + " and failed to update N = " + str(len(failedItems)) + " items")
 		return(failedItems)
+
+
+	# Import single item
+	def import_item(self, table_name = None, taskID = None, itemID = None, taskScript = None):
+
+		# Parse input
+		if table_name is None or taskID is None or itemID is None or taskScript is None:
+			print('Error, please provide table name, taskID, itemID, and a taskScript')
+
+		# Otherwise proceed
+		else:
+
+			# Construct itemDict
+			itemDict = {
+				"itemID": str(itemID),
+				"taskID": str(taskID),
+				"TaskScript": str(taskScript),
+				"lockID": "NULL",
+				"ItemState": "todo",
+				"Lock_Date": "NULL",
+				"Done_Date": "NULL",
+				"Log": {},
+				"Log_Length": 0
+			}
+
+			# Import item
+			try:
+				self.handle_DynamoTable(table_name)
+				response = self.dynamo_table.put_item(Item = itemDict, ReturnConsumedCapacity = 'TOTAL')
+				return(itemDict)
+			except:
+				print('Error importing itemID = ' + str(itemID))
+
+
+	# Import single nested item
+	def import_nested_item(self, table_name = None, taskID = None, itemID = None, taskScript = None, taskArgs = None, nested_delim = None):
+
+		# Parse input
+		if table_name is None or taskID is None or itemID is None or taskScript is None or nested_delim is None:
+			print('Error, please provide table name, taskID, itemID, taskScript, taskArgs and nested delimiter for taskArgs')
+
+		# Otherwise proceed
+		else:
+
+			# Nest the task script
+			taskArgs = str(taskArgs).split(nested_delim)
+			tasks = {}
+			for i in range(0, len(taskArgs)):
+				task = {
+					str('Task_' + str(i)): {
+						"Status": 'todo',
+						"Script": str(taskScript + ' ' + taskArgs[i]).replace('  ', ' ')
+					}
+				}
+				tasks.update(task)
+
+			# Construct the itemDict
+			itemDict = {
+				"itemID": str(itemID),
+				"taskID": str(taskID),
+				"TaskScript": tasks,
+				"lockID": "NULL",
+				"ItemState": "todo",
+				"Lock_Date": "NULL",
+				"Done_Date": "NULL",
+				"Log": {},
+				"Log_Length": 0,
+				"Nested_Tasks": int(len(taskArgs))
+			}
+
+
+			# Import item
+			try:
+				self.handle_DynamoTable(table_name)
+				response = self.dynamo_table.put_item(Item = itemDict, ReturnConsumedCapacity = 'TOTAL')
+				return(itemDict)
+			except:
+				print('Error importing itemID = ' + str(itemID))
+
+
+
+	# Import items
+	def import_items(self, data = [], delim = None, table_name = None, nested_delim = None):
+
+		# Handle inputs
+		if data is None or delim is None or table_name is None:
+			print('Please provide data in the form of "itemID|taskID|TaskScript|TaskArgs" or as file of same format, delimiter for the task data and a table_name')
+
+		# Otherwise proceed
+		else:
+
+			# Handle data as file
+			out = {'N': 0, 'Items': [ ] }
+			if os.path.isfile(str(data)):
+				pass
+
+			# Handle as string
+			elif type(data) is list and delim is not None:
+
+				# Iteratively import
+				for item in data:
+
+					# Set fields
+					out['N'] += 1
+					itemID = item.split(delim)[0]
+					taskID = item.split(delim)[1]
+					taskScript = item.split(delim)[2]
+
+					# Determine how to handle item
+					if nested_delim is None:
+
+						# Import as single item
+						print('Importing as single item')
+						log = self.import_item(table_name = table_name, taskID = taskID, itemID = itemID, taskScript = taskScript)
+						out['Items'].append(log)
+
+					# Handle as nested
+					else:
+						print('Importing as nested item')
+						taskArgs = item.split(delim)[3]
+						log = self.import_nested_item(table_name = table_name, taskID = taskID, itemID = itemID, taskScript = taskScript, taskArgs = taskArgs, nested_delim = nested_delim)
+						out['Items'].append(log)
+
+			# Otherwise pass
+			else:
+				out = str('Error parsing provided data and delimiter')
+
+
+			# Return out
+			return(out)
