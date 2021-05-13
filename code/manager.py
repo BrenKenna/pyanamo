@@ -14,6 +14,10 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 	"""
 		Class for the day-to-day management of PyAnamo tasks, which extends the PyAnamo_Client
 		The PyAnamo_Manager includes methods to:
+
+			### USE kwargs for Dynamo a little (reset items) ###
+			### Dump imports etc to manager_helper ###
+
 			# Create / Remove workflow table (Manager)
 			# Describe the workflow table schema (Manager)
 			# Set dynamo_table property
@@ -34,7 +38,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			- Translate itemStates to AWS-Batch job states (Manager + Client)
 			# Unlock / Restart tasks (Manager)
 			- Unlock specific nested tasks within specific items (Manager)
-			- Delete specific items (Manager)
+			- Delete specific items / nests in items (Client)
 			- Template for managing custom priority queue (itemStates + monitoring over time) (Manager + Client)
 	"""
 
