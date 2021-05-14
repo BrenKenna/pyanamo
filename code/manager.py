@@ -411,8 +411,8 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 								":dateDone": "NULL",
 								":log_len": int(0)
 							},
-							UpdateExpression="SET #lock = :lockingID, #state = :itemstate, #DateLock = :dateLock, #DateDone = :dateDone, #InstanceID = :instanceID, #Logging = :logging, #Log_Len = :log_len",								
-							ReturnValues="UPDATED_NEW"
+							UpdateExpression = "SET #lock = :lockingID, #state = :itemstate, #DateLock = :dateLock, #DateDone = :dateDone, #InstanceID = :instanceID, #Logging = :logging, #Log_Len = :log_len",								
+							ReturnValues = "UPDATED_NEW"
 						)
 						out['Updated'].append(str(itemID))
 
@@ -443,8 +443,8 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 							":dateDone": "NULL",
 							":log_len": int(0)
 						},
-						UpdateExpression="SET #lock = :lockingID, #state = :itemstate, #DateLock = :dateLock, #DateDone = :dateDone, #InstanceID = :instanceID, #Logging = :logging, #Log_Len = :log_len",
-						ReturnValues="UPDATED_NEW"
+						UpdateExpression = "SET #lock = :lockingID, #state = :itemstate, #DateLock = :dateLock, #DateDone = :dateDone, #InstanceID = :instanceID, #Logging = :logging, #Log_Len = :log_len",
+						ReturnValue = "UPDATED_NEW"
 					)
 					out = str('Updated item = ' + item)
 
@@ -454,3 +454,64 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 			# Return out 
 			return(out)
+
+	# Reset nest in item
+	def reset_itemNest(self, table_name, item = [], allTasks = 1, taskKey = None):
+
+		# Handle inputs
+		if table_name is None or item is None:
+			print('Error, please provide table_name, item as a dict / list, or taskKey or allTasks')
+
+		# Handle items as a list
+		if type(item) is list:
+
+			# Verify first item
+			if type(item[0]) is tuple:
+
+				# Parse list as tuple of: itemID, [tasks]
+				for i in item:
+					itemID = i[0]
+					tasks = i[1]
+					
+					# Handle tasks as list
+					if type(tasks) != list:
+
+						# Set the itemIDs taskScript.tasks.Status = todo
+
+					else:
+
+						# Iteratively update the task
+						for task in task:
+
+							# Set the itemIDs taskScript.task.Status = todo
+
+			# Otherwise reset all nested tasks
+			elif allTasks == 1:
+				for itemID in item:
+
+					# Get the taskScript for item
+
+					# Set each taskScript keys status to todo
+
+			# Otherwise log error
+			else:
+				out = 'Error, invalid format please provide items as a list of tuples (itemID, [tasks]) or list of itemIDs and DO NOT UPDATE allTasks = 1'	
+
+		# Handle resetting all taskscript keys
+		elif allTasks = 1:
+				# Get the itemIDs taskScript
+
+				# Rest task Keys
+
+		# Handle specific taskKey
+		elif taskKey != None:
+			# Set the itemIDs taskKey 
+
+
+		# Otherwise report error
+		else:
+			out = str('Error, not enough arguments supplied')
+
+
+		# Return out
+		return(out)
