@@ -455,63 +455,127 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			# Return out 
 			return(out)
 
+
+	# Update item nest
+	def updateNestedItemState(self, table_name = None, itemID = None, taskKey = None):
+
+		# Handle arguments
+		if table_name is None or itemID is None or taskKey is None:
+			print('Error, please provide a table_name, itemID and a taskKey within a taskScript to update')
+
+		# Otherwise proceed
+		else:
+
+			# Update status
+			self.handle_DynamoTable(table_name)
+			response = self.dynamo_table.update_item(
+				Key = {'itemID': str(itemID)},
+				ExpressionAttributeNames = {
+					"#taskScript": "TaskScript",
+					"#taskKey": str(taskKey),
+					"#taskStatus": 'Status',
+					"#lock": "lockID",
+					"#state": "ItemState",
+					"#InstanceID": 'InstanceID'
+				},
+				ExpressionAttributeValues = {
+					":instanceID": "NULL",
+					":lockingID": "NULL",
+					":itemstate": str('todo'),
+					":TaskStatus": str('todo')
+				},
+				UpdateExpression = "SET #lock = :lockingID, #state = :itemstate, #InstanceID = :instanceID, #taskScript.#taskKey.#taskStatus = :TaskStatus"
+			)
+
+			# Delete task Key from log
+			response = self.dynamo_table.update_item(
+				Key = {'itemID': str(itemID)},
+				ExpressionAttributeNames = {
+					"#Logging": 'Log',
+					"#taskLogging": str(taskKey)
+				},
+				UpdateExpression = "REMOVE #Logging.#taskLogging"
+			)
+			out = str('Updated item = ' + str(itemID) + ' taskKey = ' + str(taskKey))
+
+			# Log out
+			return(out)
+
 	# Reset nest in item
-	def reset_itemNest(self, table_name, item = [], allTasks = 1, taskKey = None):
+	def reset_itemNests(self, table_name, itemList = []):
 
 		# Handle inputs
-		if table_name is None or item is None:
-			print('Error, please provide table_name, item as a dict / list, or taskKey or allTasks')
+		if table_name is None or type(itemList) != list:
+			print('Error, please provide table_name, item as a list, or taskKey or allTasks')
 
 		# Handle items as a list
-		if type(item) is list:
+		elif type(item) is list:
 
 			# Verify first item
-			if type(item[0]) is tuple:
+			if type(itemList[0]) is dict:
+				out = []
+				for itemDict in itemList:
+					itemID = itemDict['itemID']
+					tasks = itemDict['TaskScript']					
 
-				# Parse list as tuple of: itemID, [tasks]
-				for i in item:
-					itemID = i[0]
-					tasks = i[1]
-					
-					# Handle tasks as list
-					if type(tasks) != list:
+					# Handle taskScript as dict
+					if type(tasks) is dict:
 
-						# Set the itemIDs taskScript.tasks.Status = todo
+						# Set the itemIDs taskScript.task.Status = todo
+						for task in tasks.keys():
+							logging = self.updateNestedItemState(table_name = table_name, itemID = itemID, taskKey = task)
+							out.append(logging)
 
+					# Otherwise reset string
 					else:
+						logging = self.updateNestedItemState(table_name = table_name, itemID = itemID, taskKey = tasks)
+						out.append(logging)
 
-						# Iteratively update the task
-						for task in task:
-
-							# Set the itemIDs taskScript.task.Status = todo
-
-			# Otherwise reset all nested tasks
-			elif allTasks == 1:
-				for itemID in item:
-
-					# Get the taskScript for item
-
-					# Set each taskScript keys status to todo
 
 			# Otherwise log error
 			else:
-				out = 'Error, invalid format please provide items as a list of tuples (itemID, [tasks]) or list of itemIDs and DO NOT UPDATE allTasks = 1'	
-
-		# Handle resetting all taskscript keys
-		elif allTasks = 1:
-				# Get the itemIDs taskScript
-
-				# Rest task Keys
-
-		# Handle specific taskKey
-		elif taskKey != None:
-			# Set the itemIDs taskKey 
-
+				out = 'Error, invalid format please provide items as a list of tuples (itemID, [tasks]) or list of itemIDs and DO NOT UPDATE allTasks = 1'
 
 		# Otherwise report error
 		else:
 			out = str('Error, not enough arguments supplied')
 
-
 		# Return out
 		return(out)
+
+
+	# Reset all nested tasks for item
+	def reset_AllNests(self, table_name, itemList = []):
+
+		# Handle arguments
+		if type(itemList) != list:
+			print('Provide a list items where all of their nested tasks are to be reset')
+
+		# Otherwise proceed
+		else:
+
+			# Iteratively reset items
+			out = []
+			self.handle_DynamoTable(table_name)
+			for itemID in itemList:
+
+				# Try get & reset task script keys
+				try:
+					response = self.dynamo_table.query(
+						ProjectionExpression = "itemID, TaskScript",
+						ExpressionAttributeNames = { "#itemID": "itemID" },
+						ExpressionAttributeValues = { ":itemKey": itemID },
+						KeyConditionExpression = '#itemID = :itemKey'
+					)
+					tasks = list(response['Items'][0]['TaskScript'].keys())
+					logging = [ self.updateNestedItemState(table_name = table_name, itemID = itemID, taskKey = task) for task in tasks ]
+
+				# Log error for itemID
+				except:
+					logging = 'Error'
+
+				# Append item logging
+				out.append({itemID: logging})
+
+			# Return out
+			return(out)
