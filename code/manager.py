@@ -37,7 +37,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			- Retrieve item logs, instanceIDs (Manager + Client-getToDoItems)
 			- Translate itemStates to AWS-Batch job states (Manager + Client)
 			# Unlock / Restart tasks (Manager)
-			- Unlock specific nested tasks within specific items (Manager)
+			# Unlock specific nested tasks within specific items (Manager)
 			- Delete specific items / nests in items (Client)
 			- Template for managing custom priority queue (itemStates + monitoring over time) (Manager + Client)
 	"""
@@ -573,6 +573,150 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 				# Log error for itemID
 				except:
 					logging = 'Error'
+
+				# Append item logging
+				out.append({itemID: logging})
+
+			# Return out
+			return(out)
+
+
+	# Delete item
+	def delete_singleItem(self, table_name, item = None):
+
+		# Handle item as string
+		self.handle_DynamoTable(table_name)
+		if item is not None and type(item) != list:
+			try:
+				response = self.dynamo_table.delete_item(Key = {'itemID': str(item)} )
+
+			except:
+				response = str('Error passing a single item must be a string')
+
+		# Otherwise delete list
+		else:
+
+			# Test deleting first item
+			itemID = item.pop(0)
+			try:
+				response = self.dynamo_table.delete_item(Key = {'itemID': str(itemID)})
+				itemDeleted = 1
+
+			except:
+				itemDeleted = 0
+
+			# Proceed with list if test was successful
+			if itemDeleted == 1:
+				response = [ self.dynamo_table.delete_item(Key = {'itemID': str(itemID)}) for itemID in item ]
+			else:
+				response = str('Error deleting item collection, must be a list. itemID = ' + itemID)
+
+		# Return response
+		return(response)
+
+
+	# Delete nested tasks in item
+	def delete_nestedTasks(self, table_name, itemID, taskKey = []):
+
+		# Handle deleting all tasks in item
+		self.handle_DynamoTable(table_name)
+		if taskKey == []:
+
+			# Get task script keys
+			out = []
+			response = self.dynamo_table.query(
+				ProjectionExpression = "itemID, TaskScript",
+				ExpressionAttributeNames = { "#itemID": "itemID" },
+				ExpressionAttributeValues = { ":itemKey": itemID },
+				KeyConditionExpression = '#itemID = :itemKey'
+			)
+			tasks = list(response['Items'][0]['TaskScript'].keys())
+
+
+			# Remove all tasks
+			for task in tasks:
+				response = self.dynamo_table.update_item(
+					Key = {'itemID': str(itemID)},
+					ExpressionAttributeNames = {
+						"#taskScript": 'TaskScript',
+						"#task": str(task)
+					},
+					UpdateExpression = "REMOVE #taskScript.#task"
+				)
+				out.append(str('Deleted task = ' + task + ' from itemID = ' + itemID))
+
+
+		# Otherwise iteratively clear taskKeys
+		elif type(taskKey) is list:
+			out = []
+			for task in taskKey:
+				response = self.dynamo_table.update_item(
+					Key = {'itemID': str(itemID)},
+					ExpressionAttributeNames = {
+						"#taskScript": 'TaskScript',
+						"#task": str(task)
+					},
+					UpdateExpression = "REMOVE #taskScript.#task"
+				)
+				out.append(str('Deleted task = ' + task + ' from itemID = ' + itemID))
+
+		# Otherwise clear the string
+		else:
+			try:
+				response = self.dynamo_table.update_item(
+					Key = {'itemID': str(itemID)},
+					ExpressionAttributeNames = {
+						"#taskScript": 'TaskScript',
+						"#task": str(taskKey)
+					},
+					UpdateExpression = "REMOVE #taskScript.#task"
+				)
+				out = str('Deleted task = ' + taskKey + ' from itemID = ' + itemID)
+
+			# Log error
+			except:
+				out = str('Error taskKey must either be None, list or a string')
+
+		# Log out
+		return(out)
+
+
+	# Clear nested tasks
+	def clear_nestedTasks(self, table_name, itemList = []):
+
+		# Handle arguments
+		if type(itemList) != list:
+			print('Provide a list items where all of their nested tasks are to be deleted')
+
+		# Otherwise treat input as list of strings
+		elif type(itemList[0]) != dict:
+
+			# Iteratively reset items
+			out = []
+			self.handle_DynamoTable(table_name)
+			for itemID in itemList:
+
+				# Try delete all task script keys
+				try:
+					logging = self.delete_nestedTasks(table_name, itemID, taskKey = [])
+
+				# Log error for itemID
+				except:
+					logging = 'Error'
+
+				# Append item logging
+				out.append({itemID: logging})
+
+		# Otherwise treat inupt as dictionary
+		else:
+			out = []
+			self.handle_DynamoTable(table_name)
+			for item in itemList:
+				itemID = item['itemID']
+				tasks = item['TaskScript']
+
+				# Delete all task script keys
+				logging = self.delete_nestedTasks(table_name, itemID, taskKey = tasks)
 
 				# Append item logging
 				out.append({itemID: logging})
