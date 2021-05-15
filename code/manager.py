@@ -17,7 +17,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 			- Alter table provisioning
 			- Set auto-scaling
-			- Translate itemStates to AWS-Batch job states (Manager + Client)
+			# Translate itemStates to AWS-Batch job states (Manager + Client)
 			- Template for managing custom priority queue (itemStates + monitoring over time) (README: Manager + Client)
 			# Create / Remove workflow table (Manager)
 			# Describe the workflow table schema (Manager)
@@ -809,3 +809,51 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 		# Return taskSummary
 		return(taskSummary)
 
+
+	# Get job states for items
+	def getItem_JobStates(self, table_name, job_queue = None):
+
+		# Query instanceIDs of locked tasks
+		self.handle_DynamoTable(table_name)
+		batch_client = boto3.client('batch')
+		lockedItems = self.dynamo_table.query(
+			IndexName = 'InstanceStateIndex',
+			ProjectionExpression = "#item, #nodeID, #task, #itemState, #logLength",
+			ExpressionAttributeNames = {
+				"#item": "itemID",
+				"#task": "taskID",
+				"#nodeID": "InstanceID",
+				"#itemState": "ItemState",
+				"#logLength": "Log_Length"
+			},
+			ExpressionAttributeValues = { ":ItemState": 'locked' },
+			KeyConditionExpression = '#itemState = :ItemState'
+		)['Items']
+		print('Checking aws states associated with N items = ' + str(len(lockedItems)))
+
+
+		# Check batch job state of lockedItems
+		itemJobStates = {'SUCCEEDED': [], 'FAILED': [], 'RUNNING': [], 'OTHER': [], 'ERROR_FETCHING': [] }
+		for task in lockedItems:
+			jobID = '-'.join(task['InstanceID'].split('-')[0:-1])
+			jobID = str(jobID + ':' + task['InstanceID'].split('-')[-1])
+			try:
+				response = batch_client.describe_jobs(jobs = [jobID])['jobs'][0]
+			except:
+				response = {'status': 'ERROR_FETCHING'}
+
+			# Handle where to store item
+			if response['status'] == 'SUCCEEDED' or response['status'] == 'FAILED' or response['status'] == 'RUNNING' or response['status'] == 'ERROR_FETCHING':
+				jobState = response['status']
+				itemJobStates[jobState].append(str(task['itemID']))
+
+			# Append to other is state is unknown
+			else:
+				jobState = response['status']
+				itemJobStates['OTHER'].append(str(jobState + "_Item_" + str(task['itemID'])))
+
+
+		# Should probably check everything from lockedItems is covered
+
+		# Return results
+		return(itemJobStates)
