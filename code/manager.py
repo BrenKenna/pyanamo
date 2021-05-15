@@ -15,31 +15,23 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 		Class for the day-to-day management of PyAnamo tasks, which extends the PyAnamo_Client
 		The PyAnamo_Manager includes methods to:
 
-			### USE kwargs for Dynamo a little (reset items) ###
-			### Dump imports etc to manager_helper ###
-
+			- Alter table provisioning
+			- Set auto-scaling
+			- Translate itemStates to AWS-Batch job states (Manager + Client)
+			- Template for managing custom priority queue (itemStates + monitoring over time) (README: Manager + Client)
 			# Create / Remove workflow table (Manager)
 			# Describe the workflow table schema (Manager)
 			# Set dynamo_table property
-			- Alter table provisioning and set auto-scaling (Manager)
 			# Check whether specific items do or do not exist (Manager + Client-getCurrentState)
 			# Import task, list or text file of tasks to table (Manager)
-			# Summarize the PyAnamo item states (optionally over-time) (Manager + Client-itemCounter)
-			- Monitor nested tasks: {
-					0% / todo: { N, [] },
-					1-25%: { N, [] },
-					26-49%: { N, [] },
-					50-74%: { N, [] },
-					75-99%: { N, [] },
-					100% / done: { N, [] }
-			}
+			# Summarize item states (optionally over-time) (Manager + Client-itemCounter)
+			# Summarize progress of nested tasks
+			# Monitor nested tasks
 			# Change item states (optionally user-defined string (Manager + Client)
-			- Retrieve item logs, instanceIDs (Manager + Client-getToDoItems)
-			- Translate itemStates to AWS-Batch job states (Manager + Client)
+			# Retrieve item logs, instanceIDs (Manager + Client-getToDoItems)
 			# Unlock / Restart tasks (Manager)
 			# Unlock specific nested tasks within specific items (Manager)
-			- Delete specific items / nests in items (Client)
-			- Template for managing custom priority queue (itemStates + monitoring over time) (Manager + Client)
+			# Delete specific items / nests in items (Client)
 	"""
 
 	# Initialize object
@@ -192,26 +184,32 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 		# Run item counter for N iterations, with wait time between them		
 		N = 0
+		taskSummary = {}
 		while N < Niterations:
 
 			# Get item IDs per state
+			iterID = str("Iteration_" + str(N))
+			iterSummary = { iterID: {'todo': 0, 'locked': 0, 'done': 0} }
 			N += 1
-			taskSummary = {}
 			itemData = self.itemCounter(self.dynamo_table)
 
 			# Populate taskSummary
 			if itemData['ItemCount'] > 0:
 				for itemState in [ 'todo', 'locked', 'done' ]:
 					stateN = len(itemData[itemState])
-					taskSummary.update( { itemState: int(stateN) } )
+					iterSummary[iterID][itemState] = stateN
+					taskSummary.update(iterSummary)
 
 				# Wait and return results
+				print(iterSummary)
 				time.sleep(int(waitTime))
-				return(taskSummary)
 
 			# Otherwise log
 			else:
 				print('No items retrived from table = ' + table_name)
+
+		# Return taskSummary
+		return(taskSummary)
 
 
 	# Set itemStates
@@ -723,3 +721,91 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 			# Return out
 			return(out)
+
+	# Summarize nested task progress
+	def summarize_nestedTasks(self, table_name, output_results = 0):
+
+		# Summarize nested tasks
+		self.handle_DynamoTable(table_name)
+		nested_task_summary = {
+			'todo': { 'N': 0, 'Items': [] },
+			'Q1': { 'N': 0, 'Items': [] },
+			'Q2': { 'N': 0, 'Items': [] },
+			'Q3': { 'N': 0, 'Items': [] },
+			'Q4': { 'N': 0, 'Items': [] },
+			'done': { 'N': 0, 'Items': [] }
+		}
+
+		# Populate todo, done
+		for itemState in [ 'todo', 'done' ]:
+			itemStateData = self.getToDoItems(itemState, recursively = 0, pyanamo_fields = None)
+			nested_task_summary[itemState]['N'] = itemStateData['N']
+			nested_task_summary[itemState]['Items'] = itemStateData['Items']
+			print( str('Item State = ' + itemState + ' N = ' + str(nested_task_summary[itemState]['N'])) )
+
+
+		# Get locked items
+		lockedItems = self.getToDoItems('locked', recursively = 0, pyanamo_fields = 'itemID, TaskID, Nested_Tasks, Log_Length, TaskScript, Log')
+
+
+		# Analyze results: Q1 = 1-25%, Q2 = 26-50%, Q3 = 51-75%, Q4 = 75-99%
+		for N in range(0, int(lockedItems['N'])):
+			itemDict = lockedItems['Items'].pop(0)
+			pct_progress = int(float(int(itemDict['Log_Length']) / int(itemDict['Nested_Tasks'])) * 100)
+			if pct_progress == 0:
+				nested_task_summary['todo']['N'] += 1
+				nested_task_summary['todo']['Items'].append(str(itemDict['itemID']))
+
+			elif pct_progress >= 1 and pct_progress <= 25:
+				nested_task_summary['Q1']['N'] += 1
+				nested_task_summary['Q1']['Items'].append(str(itemDict['itemID']))
+
+			elif pct_progress > 25 and pct_progress <= 50:
+				nested_task_summary['Q2']['N'] += 1
+				nested_task_summary['Q2']['Items'].append(str(itemDict['itemID']))
+
+			elif pct_progress > 50 and pct_progress <= 75:
+				nested_task_summary['Q3']['N'] += 1
+				nested_task_summary['Q3']['Items'].append(str(itemDict['itemID']))
+
+			elif pct_progress > 75 and pct_progress <= 99:
+				nested_task_summary['Q4']['N'] += 1
+				nested_task_summary['Q4']['Items'].append(str(itemDict['itemID']))
+
+			elif pct_progress == 100:
+				nested_task_summary['done']['N'] += 1
+				nested_task_summary['done']['Items'].append(str(itemDict['itemID']))
+
+		# Print summary
+		for taskQ in nested_task_summary.keys():
+			print(str(taskQ + ' = ' + str(nested_task_summary[taskQ]['N'])))
+
+		# Return dictionary
+		if output_results == 1:
+			return(nested_task_summary)
+
+
+	# Monitor nested tasks
+	def monitor_nestedTasks(self, table_name, Niterations = 1, waitTime = 0):
+
+		# Run item counter for N iterations, with wait time between them		
+		N = 0
+		taskSummary = {}
+		while N < Niterations:
+
+			# Get item IDs per state
+			N += 1
+			iterID = str("Iteration_" + str(N))
+			itemSummary = self.summarize_nestedTasks(table_name, output_results = 1)
+
+			# Clear items from reults
+			for summaryKey in itemSummary.keys():
+				del itemSummary[summaryKey]['Items']
+
+			# Append active iteration
+			taskSummary.update( {iterID: itemSummary} )
+			time.sleep(int(waitTime))
+
+		# Return taskSummary
+		return(taskSummary)
+
