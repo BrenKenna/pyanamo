@@ -107,6 +107,14 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 		return(out)
 
 
+	# Read a file
+	def readFile(self, data):
+		with open(data, 'r') as f:
+			data = [ line.rstrip('\n') for line in f ]
+		f.close()
+		return(data)
+
+
 	# Create table
 	def create_workflow_table(self, table_name):
 
@@ -367,6 +375,57 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 			# Return out
 			return(out)
+
+
+	# Import from file
+	def import_from_file(self, table_name = None, data = None, delim = None, nested_delim = None, force_import = 0):
+
+		# Handle arguments
+		if os.path.exists(data) == True:
+			data = self.readFile(data)
+			data = list(filter(None, data))
+
+			# Check header or force import
+			if 'itemID' in data[0].split(delim) or force_import == 1:
+
+				# Import as single item
+				if nested_delim is None:
+
+					# Handle force
+					if force_import == 0:
+						print('Importing as single items N = ' + str(len(data[1::])) )
+						out = self.import_items(data = data[1::], delim = delim, table_name = table_name)
+					else:
+						print('Importing as single items N = ' + str(len(data)) )
+						out = self.import_items(data = data, delim = delim, table_name = table_name)
+
+				# Import as nested
+				elif nested_delim is not None:
+
+					# Handle force import
+					if force_import == 0:
+						print('Importing as nested items N = ' + str(len(data[1::])) )
+						out = self.import_items(data = data[1::], delim = delim, table_name = table_name, nested_delim = nested_delim)
+					else:
+						print('Importing as nested items N = ' + str(len(data)) )
+						out = self.import_items(data = data, delim = delim, table_name = table_name, nested_delim = nested_delim)
+
+				# Otherwise log undetermined import mode
+				else:
+					out = str('Error, unable to determine how to import data. If single items please use itemID|Task_ID|TaskScript and specifiy your delimiter. If nested please append please use itemID|Task_ID|TaskScript|TaskArgs and specifiy both the delimiter and the TaskArgs delimiter')
+
+
+			# Otherwise log malformed header
+			else:
+				out = str('Error, file imports must contain a header and be of the format: itemID|TaskID|TaskScript if nesting then TaskArgs proceeds the TaskScipt with your delimiter')
+
+
+		# Otherwise log file not found
+		else:
+			out = str('Error input file = ' + data + ' not found')
+
+		# Return output
+		return(out)
 
 
 	# Restart items
@@ -811,7 +870,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 
 	# Get job states for items
-	def getItem_JobStates(self, table_name, job_queue = None):
+	def getItem_JobStates(self, table_name):
 
 		# Query instanceIDs of locked tasks
 		self.handle_DynamoTable(table_name)
