@@ -17,8 +17,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 			- Alter table provisioning
 			- Set auto-scaling
+			# Wrapper script
+			# Import from file
 			# Translate itemStates to AWS-Batch job states (Manager + Client)
-			- Template for managing custom priority queue (itemStates + monitoring over time) (README: Manager + Client)
 			# Create / Remove workflow table (Manager)
 			# Describe the workflow table schema (Manager)
 			# Set dynamo_table property
