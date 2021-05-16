@@ -16,7 +16,7 @@
 
 ## Creating Workflow Tables
 
-Users can create tables, check PyAnamo's Standard Schema, check if they exist and also delete tables. The manager is also initialized with the boto3 DynamoDB resource, so that users can "swap" between tables in their region while also being able AWS-DynamoDB code over their tables. Making the manager client a "starting off" guide.
+Users can create tables, check PyAnamo's Standard Schema, check if they exist and also delete tables. The manager is also initialized with the boto3 DynamoDB resource, so that users can "swap" between tables in their region while also being able to execute AWS Boto3-DynamoDB code over their tables. Making the manager client a "*starting off*" guide.
 
 ```python
 # Import manager client
@@ -58,7 +58,7 @@ manager_client.dynamo_table.__dict__['_name']
 
 ## Creating Tasks
 
-The manager client has methods for importing single and nested items, or as lists which the above is a wrapper for as shown in the below python "session".
+The manager client has methods for importing single and nested items, or as lists which the ''*import-items.py*'' script is a wrapper for,
 
 ```python
 # Import manager client
@@ -101,7 +101,7 @@ manager_client.import_nested_item(
 
 
 
-Users can pass a list of items to import during their python "session". They can also inspect what was imported as per the wrapper script because the output is the same.  Useful if querying todo work from RDBMS ;)
+Users can pass a list of items to import during their python "session". They can also inspect what was imported as per the wrapper script because the output is the same.
 
 ```python
 # Import manager client
@@ -179,7 +179,7 @@ monitoringData = manager_client.monitor_nestedTasks(table_name, Niterations = 2,
 
 ### Mapping Locked Items to their AWS-Batch Job State
 
-Users can also map the locked itemIDs to AWS-Batch job states. This allows users view which of their locked items still running jobs or Succeeded/Exited jobs on an itemID level. Since AWS-Batch only keeps their jobIDs for a certain amount of time, items locked by these jobs are also outputted.
+Users can also map the locked itemIDs to AWS-Batch job states. This allows users to view which of their locked items still running jobs or "*Succeeded/Exited*" jobs on an itemID level. Since AWS-Batch only keeps their jobIDs for a certain amount of time, items locked by these jobs are also outputted.
 
 ```python
 # Import
@@ -203,9 +203,11 @@ results = manager_client.getItem_JobStates(table_name)
 
 ## Managing Workflow Tasks
 
+### Restarting PyAnamo Tasks
 
+Items on DynamoDB have 3 states that PyAnamo works with: '*todo, locked and done*'. The PyAnamo Engine only requests items with an itemState of todo, it then tries to lock these and marks them as done once it finished where it moves onto the next one (conflicts managed during locking).
 
-### Restarting PyAnamo Task
+Nested tasks within an item only have 2 states which are '*todo and done*'. The PyAnamo engine only processes a nested task if its Status is todo
 
 ```python
 # Setup
@@ -246,6 +248,8 @@ out = manager_client.reset_AllNests(table_name, itemList = items)
 
 
 ### Deleting PyAnamo Tasks
+
+Items on DynamoDB for a given workflow table should really be looked at as being "*short-term / temporary*".
 
 ```python
 import manager as pmanager
