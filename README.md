@@ -16,13 +16,15 @@ Adding another layer of complextity, is that fact the lists of all these various
 
 **1). Running PyAnamo**.
 
-**3). Creating PyAnamo tasks**.
+**2). Creating PyAnamo tasks**.
 
 **NB: The example assumes AWS (IAM, ECR, Batch etc) and DynamoDB are setup for your account**.
 
 
 
 ## Run PyAnamo
+
+The collective productivity for the cluster of PyAnamo batch computing jobs is: **N Jobs * N Parallel Item * N Parallel Nests**. Meaning that 1000 jobs, fetching 3 items and working on 4 nested tasks on each of those items can have productivity of **12,000** **tasks**, instead of *1000* with a *"1 job = 1 task workflow"*.
 
 
 ```bash
@@ -42,13 +44,11 @@ python pyanamo.py -t "${PYANAMO_TABLE}" -i '2' -n '4' -b "${S3_BUCKET}" -r "${AW
 
 ## Create Tasks
 
-Examples of importing single / nested items from a file. The use of nested tasks should be dependant on the time taken for processing a collection of work per item. For the use cases in this repo, simply calling variants per chromosome of individuals genome.
+Examples of importing single / nested items from a file. The use of nested items should be dependant on the time taken for processing a collection of work per item. For the use cases in this repo, simply calling variants per chromosome of individuals genome.
 
-The use of Super Mario Play Time Optimizer is purely conceptional to demonstrate that the deployment of ETLs can be broken up and grouped into related work. Such as the hypothetical concept of optimizing the play times of Super Mario based on different levels and different difficulties. The advantage of this is that PyAnamo can parallelize the implementation by Level across an entire cluster, within each instance and also the different difficulties. These are determined by the number of jobs submitted, number of items requested to process in parallel, and the number of nests per item to process in parallel.
+The use of Super Mario Play Time Optimizer is purely conceptional to convey that the deployment of ETLs can be broken up and grouped into related work. Such as the hypothetical concept of optimizing the play times of Super Mario based on different levels and different difficulties of those levels. The advantage of this is that PyAnamo can parallelize the implementation by Level across an entire cluster + within each instance and also the different difficulties of these levels.
 
-The collective productivity for the cluster of jobs is then simply: **N Jobs * N Parallel Item * N Parallel Nests**. Meaning that 1000 jobs, fetching 3 items and working on 4 nests can have productivity of **12,000** tasks, instead of 1000 with a "1 job = 1 task workflow".
-
-Storing items in DynamoDB provides the user with a database to centralize and query the progress of their ETLs, and in the case of nested tasks do more work per job. While also having the means to simply take-up the processing of the tasks in separate jobs if needs be (see *Restarting PyAnamo Tasks*)
+Storing the todo list in DynamoDB provides the user with a database to centralize and query the progress of deploying their ETLs, and in the case of nested tasks do more work per job. While also having the means to simply take-up the processing of the tasks in separate jobs if needs be (see *Restarting PyAnamo Tasks* in the "*Creating and Managing Workflows.md*")
 
 ```bash
 # Write a list single items: Header and format is expected, delimiter optional
