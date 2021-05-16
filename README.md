@@ -16,7 +16,7 @@ Adding another layer of complextity, is that fact the lists of all these various
 
 **1). Running PyAnamo**.
 
-**2). Creating PyAnamo tasks**.
+**2). Creating PyAnamo Tasks**.
 
 **NB: The example assumes AWS (IAM, ECR, Batch etc) and DynamoDB are setup for your account**.
 
@@ -44,11 +44,11 @@ python pyanamo.py -t "${PYANAMO_TABLE}" -i '2' -n '4' -b "${S3_BUCKET}" -r "${AW
 
 ## Create Tasks
 
-Examples of importing single / nested items from a file. The use of nested items should be dependant on the time taken for processing a collection of work per item. For the use cases in this repo, simply calling variants per chromosome of individuals genome.
+Examples of importing single / nested items from a file. The use of nested items should be dependant on the time taken for processing a collection of work per item (***i.e Spot Optimized***). For the use cases in this repo, simply calling variants per chromosome of individuals genome (***~2hrs***), instead the entirety in one go (***~50hrs***).
 
-The use of Super Mario Play Time Optimizer is purely conceptional to convey that the deployment of ETLs can be broken up and grouped into related work. Such as the hypothetical concept of optimizing the play times of Super Mario based on different levels and different difficulties of those levels. The advantage of this is that PyAnamo can parallelize the implementation by Level across an entire cluster + within each instance and also the different difficulties of these levels.
+The use of the Super Mario Play Time Optimizer is purely conceptional to convey that the *deployment of ETLs can be broken up and grouped* into related work (*like chromosomes per persons genome*). Such as the hypothetical concept of optimizing the play times for Super Mario based on training on different levels and the different difficulties of those levels. 
 
-Storing the todo list in DynamoDB provides the user with a database to centralize and query the progress of deploying their ETLs, and in the case of nested tasks do more work per job. While also having the means to simply take-up the processing of the tasks in separate jobs if needs be (see *Restarting PyAnamo Tasks* in the "*Creating and Managing Workflows.md*")
+The advantage of this is that PyAnamo can parallelize the implementation by Level across an entire cluster (*number of jobs*), within each instance (*single item parallelization*) and also the different difficulties of these levels (*nested task parallelization*).
 
 ```bash
 # Write a list single items: Header and format is expected, delimiter optional
@@ -78,3 +78,7 @@ Level_2_Time|Level_2|bash SuperMarioPlayTimeOptimizer.sh 2 Easy,Normal,Hard
 # Import
 python import-items.py 'Example_Table' 'us-east-1' 'import-nested-testing.txt' '|' ','
 ```
+
+
+
+Storing the todo list in DynamoDB provides the user with a *database to centralize and query the progress of deploying their ETLs*, and in the case of nested tasks do more work per job. While also having the means to simply take-up the processing of the tasks in separate jobs if needs be (see *Restarting PyAnamo Tasks* in the "***Creating and Managing Workflows.md***"), alongside the simple monitoring of the workflow as whole and progress of nested tasks (see *Monitoring Workflow Progress* in the "***Creating and Managing Workflows.md***")
