@@ -76,5 +76,5 @@ Level_2_Time|Level_2|bash SuperMarioPlayTimeOptimizer.sh 2 Easy,Normal,Hard
 
 
 # Import
-python import-items.py 'Testing' 'us-east-1' 'import-nested-testing.txt' '|' ','
+python import-items.py 'Example_Table' 'us-east-1' 'import-nested-testing.txt' '|' ','
 ```
