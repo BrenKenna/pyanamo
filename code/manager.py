@@ -15,9 +15,8 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 		Class for the day-to-day management of PyAnamo tasks, which extends the PyAnamo_Client
 		The PyAnamo_Manager includes methods to:
 
-			- Alter table provisioning
-			- Set auto-scaling
-			# Wrapper script
+			# Alter table provisioning
+			# Set auto-scaling
 			# Import from file
 			# Translate itemStates to AWS-Batch job states (Manager + Client)
 			# Create / Remove workflow table (Manager)
