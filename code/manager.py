@@ -48,6 +48,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Set dynamoDB table proberty to self
 	def set_dynamoProperty(self, table_name):
+		"""
+			Set a DynamoDB Table proberty to self if table exists
+		"""
 
 		# Set property and log to user
 		try:
@@ -61,6 +64,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Handle dynamo_table object
 	def handle_DynamoTable(self, table_name):
+		"""
+			Simple wrapper to handle swapping between DynamoDB tables with that provided
+		"""
 
 		# Check table object is a property
 		if 'dynamo_table' in self.__dict__:
@@ -79,6 +85,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Check if table exists
 	def check_table(self, table_name, output_schema = None):
+		"""
+			Return a 0 or 1 for whether or not supplied table exists, optionally output schema 
+		"""
 
 		# Try describe table
 		try:
@@ -102,21 +111,30 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Read local json file
 	def read_jsonFile(self, data):
+		"""
+			Read input json file, ie a users custom changes to the workflow-gsi.json
+		"""
 		with open(data) as json_file:
 				out = json.load(json_file)
 		return(out)
 
 
 	# Read a file
-	def readFile(self, data):
+	def readFile(self, data, line_delim = '\n'):
+		"""
+			Read input text file with default line delimiter of new line. For item imports
+		"""
 		with open(data, 'r') as f:
-			data = [ line.rstrip('\n') for line in f ]
+			data = [ line.rstrip(line_delim) for line in f ]
 		f.close()
 		return(data)
 
 
 	# Create table
 	def create_workflow_table(self, table_name):
+		"""
+			Create table if not exists
+		"""
 
 		# Try read json otherwise use template
 		pyanamoTableTemplate = str(os.environ['PYANAMO'] + '/workflow-gsi-index.json')
@@ -167,6 +185,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Delete workflow table
 	def delete_workflow_table(self, table_name):
+		"""
+			Delete table if exists
+		"""
 
 		# Delete table if exists
 		table_exists = self.check_table(table_name)
@@ -186,6 +207,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Monitor tasks
 	def monitor_task(self, table_name, Niterations = 1, waitTime = 0):
+		"""
+			Monitor task table for a number of iterations waiting supplied seconds after iteration
+		"""
 
 		# Handle table object
 		self.handle_DynamoTable(table_name)
@@ -222,6 +246,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Set itemStates
 	def updateItemStates(self, table_name, itemID_list, itemState):
+		"""
+			Update the workflow table table itemID string / list with itemState
+		"""
 
 		# Iteratively update the list of items to itemState
 		self.handle_DynamoTable(table_name)
@@ -249,6 +276,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Import single item
 	def import_item(self, table_name = None, taskID = None, itemID = None, taskScript = None):
+		"""
+			Import the supplied item data into the workflow table
+		"""
 
 		# Parse input
 		if table_name is None or taskID is None or itemID is None or taskScript is None:
@@ -281,6 +311,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Import single nested item
 	def import_nested_item(self, table_name = None, taskID = None, itemID = None, taskScript = None, taskArgs = None, nested_delim = None):
+		"""
+			Import supplied item data as a nested task to the workflow table
+		"""
 
 		# Parse input
 		if table_name is None or taskID is None or itemID is None or taskScript is None or nested_delim is None:
@@ -328,6 +361,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Import items
 	def import_items(self, data = [], delim = None, table_name = None, nested_delim = None):
+		"""
+			Wrapper to handle importing a list of single / nested task Items
+		"""
 
 		# Handle inputs
 		if data is None or delim is None or table_name is None:
@@ -373,6 +409,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Import from file
 	def import_from_file(self, table_name = None, data = None, delim = None, nested_delim = None, force_import = 0):
+		"""
+			Wrapper to handle import single / nested task items from a text file. Can force_import = 1 if imports match standard format
+		"""
 
 		# Handle arguments
 		if os.path.exists(data) == True:
@@ -424,6 +463,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Restart items
 	def reset_itemState(self, table_name = None, itemState = None, item = []):
+		"""
+			Set a desired state for a string / list of items
+		"""
 
 		# Handle arguments
 		if table_name is None or itemState is None or item == []:
@@ -509,6 +551,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Update item nest
 	def updateNestedItemState(self, table_name = None, itemID = None, taskKey = None):
+		"""
+			Set nested tasks to a 'todo' state for the provided itemID and taskKey
+		"""
 
 		# Handle arguments
 		if table_name is None or itemID is None or taskKey is None:
@@ -554,6 +599,12 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Reset nest in item
 	def reset_itemNests(self, table_name, itemList = []):
+		"""
+			Wrapper for unlocking nested tasks 
+				itemList = [
+					{'itemID': 'someID', 'TaskScript': [ 'Task_0' , 'Task_N']}
+				]
+		"""
 
 		# Handle inputs
 		if table_name is None or type(itemList) != list:
@@ -597,6 +648,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Reset all nested tasks for item
 	def reset_AllNests(self, table_name, itemList = []):
+		"""
+			Unlock all nested items in the provide list of itemIDs
+		"""
 
 		# Handle arguments
 		if type(itemList) != list:
@@ -634,6 +688,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Delete item
 	def delete_singleItem(self, table_name, item = None):
+		"""
+			Delete an itemID or list of itemIDs
+		"""
 
 		# Handle item as string
 		self.handle_DynamoTable(table_name)
@@ -668,6 +725,10 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Delete nested tasks in item
 	def delete_nestedTasks(self, table_name, itemID, taskKey = []):
+		"""
+			Delete the string / list of TaskScript keys for the supplied itemID.
+			!!!! WARNING: ALL TASK SCRIPT KEYS WILL BE DELETED IF LIST IS EMPTY :) !!!!
+		"""
 
 		# Handle deleting all tasks in item
 		self.handle_DynamoTable(table_name)
@@ -777,6 +838,17 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Summarize nested task progress
 	def summarize_nestedTasks(self, table_name, output_results = 0):
+		"""
+			Summarize the progress of nested tasks in the form of
+			output = {
+				'0% ie todo': { 'N': int, 'Items': [ list of itemIDs ] },
+				'1-24%': { 'N': int, 'Items': [ ] },
+				'25-49%': { 'N': int, 'Items': [ ] },
+				'50-74%': { 'N': int, 'Items': [ ] },
+				'75-99%': { 'N': int, 'Items': [ ] },
+				'100% ie done': { 'N': int, 'Items': [ ] }
+			}
+		"""
 
 		# Summarize nested tasks
 		self.handle_DynamoTable(table_name)
@@ -840,6 +912,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Monitor nested tasks
 	def monitor_nestedTasks(self, table_name, Niterations = 1, waitTime = 0):
+		"""
+			Monitor the nested task summary over time
+		"""
 
 		# Run item counter for N iterations, with wait time between them		
 		N = 0
@@ -865,6 +940,16 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Get job states for items
 	def getItem_JobStates(self, table_name):
+		"""
+			Map locked items to their AWS-Batch job states
+			output = {
+				'SUCCEEDED': [],
+				'FAILED': [],
+				'RUNNING': [],
+				'OTHER': [],
+				'ERROR_FETCHING': []
+			}
+		"""
 
 		# Query instanceIDs of locked tasks
 		self.handle_DynamoTable(table_name)
@@ -911,6 +996,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Set hard provisioning for read/write
 	def set_hardProvision(self, table_name, writeCapacity, readCapacity):
+		"""
+			Set custom Read and Write Capacity units of some workflow table by their name
+		"""
 
 		# Hard provision of table with supplied capacities
 		self.handle_DynamoTable(table_name)
@@ -942,6 +1030,10 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Set autoscaling target
 	def setAutoScalingTarget(self, table_name, writeCapacity, readCapacity):
+		"""
+			Set the auto-scaling targets of the table + GSI
+			!!!! WARNING: ONLY NEEDS TO BE DONE ONCE PER TABLE !!!
+		"""
 
 		# Set auto-scaling provision values: Table and GSI
 		capacityData = {'WriteCapacity': int(writeCapacity), 'ReadCapacity': int(readCapacity)}
@@ -1001,6 +1093,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 	# Put scaling policies on table + GSI
 	def putScalingPolicy(self, table_name, target_Value, scaleDown, scaleUp):
+		"""
+			Apply desired auto-scaling to table + GSI
+		"""
 
 		# Put scaling policy output template
 		[ int(scaleUp), int(scaleDown), float(target_Value) ]
