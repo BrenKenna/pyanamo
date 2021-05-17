@@ -54,6 +54,40 @@ manager_client.handle_DynamoTable(table_name)
 manager_client.dynamo_table.__dict__['_name']
 ```
 
+### Provisioning / Auto-Scaling Tables
+
+#### Use Custom Read & Write Capacity Values for Sessions
+
+```python
+# Setup manager
+import manager as pmanager
+user_data = { "table_name": 'Testing_3', "aws_region": 'us-east-1' }
+manager_client = pmanager.PyAnamo_Manager(dynamo_table = user_data['table_name'], region = user_data['aws_region'])
+
+
+# Set read & write capacity
+user_data.update( {'WriteCapacity': 70, 'ReadCapacity': 70} )
+out = manager_client.set_hardProvision(user_data['table_name'], user_data['WriteCapacity'], user_data['ReadCapacity'])
+```
+
+#### Use Auto-Scaling <u>Before Deploying PyAnamo</u> + After Session
+
+```python
+# Setup manager
+import manager as pmanager
+user_data = { "table_name": 'Testing_3', "aws_region": 'us-east-1' }
+manager_client = pmanager.PyAnamo_Manager(dynamo_table = user_data['table_name'], region = user_data['aws_region'])
+manager_client.set_dynamoProperty('Testing_3')
+
+
+# Register autoscaling target: NB PERFORM ONCE PER TABLE
+targetRegister = manager_client.setAutoScalingTarget(user_data['table_name'], 70, 70)
+
+
+# Put scaling policy on table and indexes
+policyLog = manager_client.putScalingPolicy(user_data['table_name'], 40, 60, 60)
+```
+
 
 
 ## Creating Tasks
