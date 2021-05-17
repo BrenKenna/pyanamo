@@ -18,20 +18,20 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			# Alter table provisioning
 			# Set auto-scaling
 			# Import from file
-			# Translate itemStates to AWS-Batch job states (Manager + Client)
-			# Create / Remove workflow table (Manager)
-			# Describe the workflow table schema (Manager)
+			# Translate itemStates to AWS-Batch job states
+			# Create / Remove workflow table
+			# Describe the workflow table schema
 			# Set dynamo_table property
-			# Check whether specific items do or do not exist (Manager + Client-getCurrentState)
-			# Import task, list or text file of tasks to table (Manager)
-			# Summarize item states (optionally over-time) (Manager + Client-itemCounter)
+			# Check whether specific items do or do not exist
+			# Import task, list or text file of tasks to table
+			# Summarize item states
 			# Summarize progress of nested tasks
 			# Monitor nested tasks
-			# Change item states (optionally user-defined string (Manager + Client)
-			# Retrieve item logs, instanceIDs (Manager + Client-getToDoItems)
-			# Unlock / Restart tasks (Manager)
-			# Unlock specific nested tasks within specific items (Manager)
-			# Delete specific items / nests in items (Client)
+			# Change item states
+			# Retrieve item logs, instanceIDs
+			# Unlock / Restart tasks
+			# Unlock specific nested tasks within specific items
+			# Delete specific items / nests in items
 	"""
 
 	# Initialize object
