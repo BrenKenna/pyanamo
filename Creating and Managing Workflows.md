@@ -84,7 +84,7 @@ manager_client.set_dynamoProperty('Testing_3')
 targetRegister = manager_client.setAutoScalingTarget(user_data['table_name'], 70, 70)
 
 
-# Put scaling policy on table and indexes
+# Put scaling policy on table and indexes: Target Value, ScaleDown, ScaleUp
 policyLog = manager_client.putScalingPolicy(user_data['table_name'], 40, 60, 60)
 ```
 
