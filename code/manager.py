@@ -337,13 +337,9 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 		# Otherwise proceed
 		else:
 
-			# Handle data as file
+			# Handle iterative imports
 			out = {'N': 0, 'Items': [ ] }
-			if os.path.isfile(str(data)):
-				pass
-
-			# Handle as string
-			elif type(data) is list and delim is not None:
+			if type(data) is list and delim is not None:
 
 				# Iteratively import
 				for item in data:
@@ -358,13 +354,11 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 					if nested_delim is None:
 
 						# Import as single item
-						print('Importing as single item')
 						log = self.import_item(table_name = table_name, taskID = taskID, itemID = itemID, taskScript = taskScript)
 						out['Items'].append(log)
 
 					# Handle as nested
 					else:
-						print('Importing as nested item')
 						taskArgs = item.split(delim)[3]
 						log = self.import_nested_item(table_name = table_name, taskID = taskID, itemID = itemID, taskScript = taskScript, taskArgs = taskArgs, nested_delim = nested_delim)
 						out['Items'].append(log)
@@ -912,8 +906,167 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 				jobState = response['status']
 				itemJobStates['OTHER'].append(str(jobState + "_Item_" + str(task['itemID'])))
 
-
-		# Should probably check everything from lockedItems is covered
-
 		# Return results
 		return(itemJobStates)
+
+
+	# Set hard provisioning for read/write
+	def set_hardProvision(self, table_name, writeCapacity, readCapacity):
+
+		# Hard provision of table with supplied capacities
+		self.handle_DynamoTable(table_name)
+		dynamodb_client = boto3.client('dynamodb')
+		basTableProvisioning = {'ReadCapacityUnits': int(readCapacity), 'WriteCapacityUnits': int(writeCapacity)}
+		GSI_Provisioning = { "GlobalSecondaryIndexUpdates": [
+			{ 'Update': { 'IndexName': 'ItemStateIndex','ProvisionedThroughput': { 'ReadCapacityUnits': int(readCapacity), 'WriteCapacityUnits': int(writeCapacity) }} },
+			{ 'Update': { 'IndexName': 'TaskStateIndex','ProvisionedThroughput': { 'ReadCapacityUnits': int(readCapacity), 'WriteCapacityUnits': int(writeCapacity) }} },
+			{ 'Update': { 'IndexName': 'InstanceStateIndex','ProvisionedThroughput': { 'ReadCapacityUnits': int(readCapacity), 'WriteCapacityUnits': int(writeCapacity) }} },
+			{ 'Update': { 'IndexName': 'LoggingIndex','ProvisionedThroughput': { 'ReadCapacityUnits': int(readCapacity), 'WriteCapacityUnits': int(writeCapacity) }} }
+			]
+		}
+
+		# Apply provisioning
+		try:
+			response = dynamodb_client.update_table(
+				TableName = table_name,
+				ProvisionedThroughput = basTableProvisioning,
+				GlobalSecondaryIndexUpdates = GSI_Provisioning['GlobalSecondaryIndexUpdates']
+			)
+			time.sleep(int(10))
+			out = response['TableDescription']
+		except dynamodb_client.exceptions.ClientError as dynamoError:
+			print('Error setting the provisioning of the requested table. See DynamoDB error in output')
+			out = dynamoError
+
+		# Return output
+		return(out)
+
+	# Set autoscaling target
+	def setAutoScalingTarget(self, table_name, writeCapacity, readCapacity):
+
+		# Set auto-scaling provision values: Table and GSI
+		capacityData = {'WriteCapacity': int(writeCapacity), 'ReadCapacity': int(readCapacity)}
+		table_scaling = [
+			( str('table/' + table_name), 'dynamodb:table' ),
+			( str('table/' + table_name + '/index/' + "ItemStateIndex"), 'dynamodb:index'),
+			( str('table/' + table_name + '/index/' + "TaskStateIndex"), 'dynamodb:index'),
+			( str('table/' + table_name + '/index/' + "InstanceStateIndex"), 'dynamodb:index'),
+			( str('table/' + table_name + '/index/' + "LoggingIndex"), 'dynamodb:index')
+		]
+
+		# Register a scalable target with min and max bound for Read + Write
+		autoscaling_client = boto3.client('application-autoscaling')
+		out = {
+			'ScalableTarget': {
+				'Read_Capacity': {'Success': [] , 'Failed': [] },
+				'Write_Capacity': {'Success': [] , 'Failed': [] }
+			}
+		}
+
+		# Register the read and then the write capacity
+		for scaleComponent in table_scaling:
+			scale_resourceID = scaleComponent[0]
+			scale_Dimension = scaleComponent[1]
+
+			try:
+				response = autoscaling_client.register_scalable_target(
+					ServiceNamespace = 'dynamodb',
+					ResourceId = scale_resourceID,
+					ScalableDimension = str(scale_Dimension + ':ReadCapacityUnits'),
+					MinCapacity = 1,
+					MaxCapacity = capacityData['ReadCapacity'],
+					SuspendedState = { 'DynamicScalingInSuspended': False, 'DynamicScalingOutSuspended': False, 'ScheduledScalingSuspended': False  }
+				)
+				out['ScalableTarget']['Read_Capacity']['Success'].append(str(scale_resourceID + ' ' + scale_Dimension))
+			except:
+				out['ScalableTarget']['Read_Capacity']['Failed'].append(str(scale_resourceID + ' ' + scale_Dimension))
+
+			# Register write capacity
+			try:
+				response = autoscaling_client.register_scalable_target(
+					ServiceNamespace = 'dynamodb',
+					ResourceId = scale_resourceID,
+					ScalableDimension = str(scale_Dimension + ':WriteCapacityUnits'),
+					MinCapacity = 1,
+					MaxCapacity = capacityData['WriteCapacity'],
+					SuspendedState = { 'DynamicScalingInSuspended': False, 'DynamicScalingOutSuspended': False, 'ScheduledScalingSuspended': False  }
+					)
+				out['ScalableTarget']['Write_Capacity']['Success'].append(str(scale_resourceID + ' ' + scale_Dimension))
+			except:
+				out['ScalableTarget']['Write_Capacity']['Success'].append(str(scale_resourceID + ' ' + scale_Dimension))
+
+		# Wait and return out
+		time.sleep(int(10))
+		return(out)
+
+
+	# Put scaling policies on table + GSI
+	def putScalingPolicy(self, table_name, target_Value, scaleDown, scaleUp):
+
+		# Put scaling policy output template
+		[ int(scaleUp), int(scaleDown), float(target_Value) ]
+		autoscaling_client = boto3.client('application-autoscaling')
+		out = { 
+			'Put_Policy': {
+				'Read_Capacity': {'Success': [] , 'Failed': [] },
+				'Write_Capacity': {'Success': [] , 'Failed': [] }
+			}
+		}
+
+		# Policies to add Read and Write for
+		table_scaling = [
+			( str('table/' + table_name), 'dynamodb:table' ),
+			( str('table/' + table_name + '/index/' + "ItemStateIndex"), 'dynamodb:index'),
+			( str('table/' + table_name + '/index/' + "TaskStateIndex"), 'dynamodb:index'),
+			( str('table/' + table_name + '/index/' + "InstanceStateIndex"), 'dynamodb:index'),
+			( str('table/' + table_name + '/index/' + "LoggingIndex"), 'dynamodb:index')
+		]
+
+
+		# Read then write, table then indexes
+		for scaling_component in table_scaling:
+			scaling_resourceID = scaling_component[0]
+			scaling_Dimension = scaling_component[1]
+			scaling_PolicyName = str(table_name + '_' + scaling_resourceID.split('/')[-1]).replace(table_name + '_' + table_name, table_name)
+
+			# Write capacity 
+			try:
+				response = autoscaling_client.put_scaling_policy(
+    				PolicyName = str(scaling_PolicyName + '_Write_Capacity_Scaling'),
+    				ServiceNamespace = 'dynamodb',
+    				ResourceId = scaling_resourceID,
+    				ScalableDimension = str(scaling_Dimension + ':WriteCapacityUnits'),
+    				PolicyType = 'TargetTrackingScaling',
+					TargetTrackingScalingPolicyConfiguration = {
+						'PredefinedMetricSpecification': { 'PredefinedMetricType': 'DynamoDBWriteCapacityUtilization' },
+						'ScaleOutCooldown': int(scaleUp),
+						'ScaleInCooldown': int(scaleDown),
+						'TargetValue': float(target_Value)
+					}
+				)
+				out['Put_Policy']['Write_Capacity']['Success'].append(response['PolicyARN'])
+			except:
+				out['Put_Policy']['Write_Capacity']['Failed'].append(scaling_PolicyName)
+
+			# Read capacity
+			try:
+				response = autoscaling_client.put_scaling_policy(
+    				PolicyName = str(scaling_PolicyName + '_Read_Capacity_Scaling'),
+    				ServiceNamespace = 'dynamodb',
+    				ResourceId = scaling_resourceID,
+    				ScalableDimension = str(scaling_Dimension + ':ReadCapacityUnits'),
+    				PolicyType = 'TargetTrackingScaling',
+					TargetTrackingScalingPolicyConfiguration = {
+						'PredefinedMetricSpecification': { 'PredefinedMetricType': 'DynamoDBReadCapacityUtilization' },
+						'ScaleOutCooldown': int(scaleUp),
+						'ScaleInCooldown': int(scaleDown),
+						'TargetValue': float(target_Value)
+					}
+					)
+				out['Put_Policy']['Read_Capacity']['Success'].append(response['PolicyARN'])
+			except:
+				out['Put_Policy']['Read_Capacity']['Failed'].append(scaling_PolicyName)
+
+		# Return output
+		time.sleep(int(10))
+		return(out)
