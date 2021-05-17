@@ -18,7 +18,7 @@ Adding another layer of complextity, is that fact the lists of all these various
 
 **2). Creating PyAnamo Tasks**.
 
-**NB: The example assumes AWS (IAM, ECR, Batch etc) and DynamoDB are setup for your account**.
+**NB: The example assumes AWS (Credentials, IAM, ECR, Batch etc) and DynamoDB are setup for your account**.
 
 
 
