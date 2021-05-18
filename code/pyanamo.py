@@ -16,7 +16,7 @@ import client as pc
 import modifier as pm
 import executor
 import runner
-import parallelize_runner
+import parallel_processes
 
 
 # Exit if environmental variables are not defined
@@ -123,7 +123,7 @@ if parallel_items > 1:
 
 	# Parallel mode
 	sys.stdout.write('\nDelgating PyAnamo Runner instantiation\n')
-	parallelize_runner.main(parallel_items, Nested_Processes = parallel_nests, aws_kwargs = aws_kwargs)
+	parallel_processes.singleItem_main(parallel_items, Nested_Processes = parallel_nests, aws_kwargs = aws_kwargs)
 
 
 # Single processes

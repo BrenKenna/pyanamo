@@ -84,20 +84,40 @@ class PyAnamo_Client():
 		# Handle pyanamo fields: Item ID
 		if pyanamo_fields == None:
 			pyanamo_fields = "itemID"
+			query_kwargs = {
+				"IndexName" : "ItemStateIndex",
+				"ProjectionExpression": pyanamo_fields,
+				"ExpressionAttributeNames": { "#itemstate": "ItemState"},
+				"ExpressionAttributeValues": { ":state": itemState },
+				"KeyConditionExpression": '#itemstate = :state'
+			}
 
 		# Otherwise replace key words
 		else:
-			pyanamo_fields = ", ".join(set([ i.replace(i, '#taskLog') if i == 'Log' else i for i in pyanamo_fields.replace(' ', '').split(',') ]))
 
+			# Template to hold original a new values (and as list)
+			queryFields = {
+				"ProjectionExpression": [],
+				"ExpressionAttributeNames": {}
+			}
+			for i in pyanamo_fields.replace(' ', '').split(','):
+				if i == 'Log':
+					fieldDict = { str('#Task' + str(i)): str(i) }
+					queryFields['ProjectionExpression'].append(str('#Task' + str(i)))
+					queryFields['ExpressionAttributeNames'].update(fieldDict)
+				else:
+					fieldDict = { str('#' + str(i)): str(i) }
+					queryFields['ProjectionExpression'].append(str('#' + str(i)))
+					queryFields['ExpressionAttributeNames'].update(fieldDict)		
 
-		# Template query
-		query_kwargs = {
-			"IndexName" : "ItemStateIndex",
-			"ProjectionExpression": pyanamo_fields,
-			"ExpressionAttributeNames": { "#itemstate": "ItemState", "#taskLog": 'Log' },
-			"ExpressionAttributeValues": { ":state": itemState },
-			"KeyConditionExpression": '#itemstate = :state'
-		}
+			# Set kwargs for query
+			query_kwargs = {
+				"IndexName" : "ItemStateIndex",
+				"ProjectionExpression": ', '.join(queryFields['ProjectionExpression']),
+				"ExpressionAttributeNames": queryFields['ExpressionAttributeNames'],
+				"ExpressionAttributeValues": { ":state": itemState },
+				"KeyConditionExpression": '#ItemState = :state'
+			}
 
 
 		# Run query

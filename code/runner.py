@@ -8,7 +8,7 @@ from datetime import datetime
 import executor
 import client as pc
 import modifier as pm
-import parallelize_nested
+import parallel_processes
 
 
 # Iterate over todo items: Import random, lockStreak as self.___
@@ -24,15 +24,14 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 	def __init__(self, dynamo_table, s3Bucket = None, Parallel_Nests = 0, aws_region = None, todoDict = None):
 		super(PyAnamo_Runner, self)
 		self.dynamo_table = dynamo_table
-		self.s3Bucket = s3Bucket
-		self.aws_region = aws_region
-		self.Parallel_Nests = Parallel_Nests
 		self.table_name = dynamo_table.name
+		self.Parallel_Nests = Parallel_Nests
+		self.s3Bucket = s3Bucket
 		self.aws_kwargs = {
-				"region": self.aws_region,
-				"s3_key": self.s3Bucket,
-				"nested_parallel": self.Parallel_Nests,
-				"dynamo_table": self.table_name
+				"region": aws_region,
+				"s3_key": s3Bucket,
+				"nested_parallel": Parallel_Nests,
+				"dynamo_table": dynamo_table.name
 			}
 		self.lockStreak = 0
 		self.instanceID = self.getInstanceID()
@@ -144,7 +143,7 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 
 						# Process the item as nested: 
 						print("Parallel processing active task as nested item")
-						parallelize_nested.main(self.Parallel_Nests, aws_kwargs = self.aws_kwargs, nested_item = todo_item)
+						parallel_processes.nestedItem_main(self.Parallel_Nests, aws_kwargs = self.aws_kwargs, nested_item = todo_item)
 						self.updateNestedItem(itemID)
 						print('\nExecution successful, updating itemID = ' + str(itemID) + ' as done')
 
