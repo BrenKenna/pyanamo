@@ -19,7 +19,3 @@ class TimeKeeperError(Exception):
 
 			else:
 				return 'Error processing nested tasks. Not enough time left to process the next nested task'
-
-
-# raise TimeKeeperError
-# raise TimeKeeperError('')
