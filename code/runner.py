@@ -9,6 +9,8 @@ import executor
 import client as pc
 import modifier as pm
 import parallel_processes
+import pyanamo_errors as perr
+import timeKeeper as ptk
 
 
 # Iterate over todo items: Import random, lockStreak as self.___
@@ -21,7 +23,7 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 	"""
 
 	# Initialize
-	def __init__(self, dynamo_table, s3Bucket = None, Parallel_Nests = 0, aws_region = None, todoDict = None):
+	def __init__(self, dynamo_table, s3Bucket = None, Parallel_Nests = 0, aws_region = None, todoDict = None, timeLimit = None):
 		super(PyAnamo_Runner, self)
 		self.dynamo_table = dynamo_table
 		self.table_name = dynamo_table.name
@@ -35,6 +37,7 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 			}
 		self.lockStreak = 0
 		self.instanceID = self.getInstanceID()
+		self.timeLimit = timeLimit
 
 		# Handle instantition outside of main process (nested item parallelization)
 		if todoDict == None:
@@ -47,6 +50,10 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 				"N": 0,
 				"Items": [ ]
 			}
+
+		# Handle composing time keeper: Have validation as a function
+		if self.timeLimit != None:
+			self.timeKeeper = ptk.PyAnamo_TimeKeeper(timeLimit)
 
 
 	# Handle processing un-nested / single task items: taskScript, todo_item

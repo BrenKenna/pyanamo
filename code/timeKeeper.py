@@ -3,7 +3,8 @@
 
 # Import modules
 from datetime import datetime
-import timeKeeperError
+import pyanamo_errors
+
 
 # Class to monitor wall time through function class
 class PyAnamo_TimeKeeper():
@@ -14,8 +15,8 @@ class PyAnamo_TimeKeeper():
 		# Template timing dataset
 		creationTime = datetime.now()
 		dummyCurrentTime = datetime.now()
-		dummyElapsedTime = float( (dummyCurrentTime - creationTime).total_seconds() )
-		dummyWallTime = float( (dummyCurrentTime - creationTime).total_seconds() )
+		dummyElapsedTime = round(float((dummyCurrentTime - creationTime).total_seconds()), 1)
+		dummyWallTime = round(float((dummyCurrentTime - creationTime).total_seconds()), 1)
 		self.timeKeeping = {
 			'Time_Limit': timeLimit,
 			'Creation_Time': creationTime,
@@ -32,34 +33,40 @@ class PyAnamo_TimeKeeper():
 	def updateCurrentTime(self):
 
 		# Move last time to previous
-		previousTime = self.timeKeeping['Current_Time']
-		del self.timeKeeping['Previous_Time']
-		self.timeKeeping.update( { 'Previous_Time': previousTime} )
+		self.timeKeeping['Previous_Time'] = self.timeKeeping['Current_Time']
 
 		# Check current, elapsed and wall times
 		currentTime = datetime.now()
-		elapsedTime = round(float( (currentTime - self.timeKeeping['Previous_Time']).total_seconds() ), 2)
-		wallTime = round(float( (currentTime - self.timeKeeping['Creation_Time']).total_seconds() ), 2)
+		elapsedTime = round(float( (currentTime - self.timeKeeping['Previous_Time']).total_seconds()), 1)
+		wallTime = round(float( (currentTime - self.timeKeeping['Creation_Time']).total_seconds()), 1)
 
 		# Update data
 		self.timeKeeping['Wall_Time'] = wallTime
 		self.timeKeeping['Current_Time'] = currentTime
 		self.timeKeeping['Elapsed_Time'] = elapsedTime
 		self.timeKeeping['Elapsed_Time_Data']['Updates'] += 1
-		self.timeKeeping['Elapsed_Time_Data']['Times'].append(elapsedTime)
-		self.timeKeeping['Average_Elapsed_Time'] = round(float(sum(self.timeKeeping['Elapsed_Time_Data']['Times']) / len(self.timeKeeping['Elapsed_Time_Data']['Times'])), 2)
-		self.timeKeeping['Next_Elapse'] = int(self.timeKeeping['Wall_Time'] + self.timeKeeping['Average_Elapsed_Time'])
+
+		# Stop times list from getting too big
+		if len(self.timeKeeping['Elapsed_Time_Data']['Times']) == 10:
+			self.timeKeeping['Elapsed_Time_Data']['Times'] = [ round(self.timeKeeping['Average_Elapsed_Time'], 1) ]
+			self.timeKeeping['Elapsed_Time_Data']['Times'].append(elapsedTime)
+
+		else:
+			self.timeKeeping['Elapsed_Time_Data']['Times'].append(elapsedTime)
+
+		self.timeKeeping['Average_Elapsed_Time'] = round(float(sum(self.timeKeeping['Elapsed_Time_Data']['Times']) / len(self.timeKeeping['Elapsed_Time_Data']['Times'])), 1)
+		self.timeKeeping['Next_Elapse'] = round(self.timeKeeping['Wall_Time'] + self.timeKeeping['Average_Elapsed_Time'], 1)
 
 	# Check data
 	def check_ElapsedTime(self):
 
 		# Check if elapsed time is above time limit
 		if self.timeKeeping['Wall_Time'] > self.timeKeeping['Time_Limit']:
-			raise timeKeeperError.TimeKeeperError(str('Wall time limit = ' + str(self.timeKeeping['Wall_Time']) + ' exceeded' ))
+			raise pyanamo_errors.TimeKeeperError(str('Wall time limit = ' + str(self.timeKeeping['Wall_Time']) + ' exceeded' ))
 
 		# Otherwise check if safe to elapse another average time
 		elif self.timeKeeping['Next_Elapse'] > self.timeKeeping['Time_Limit']:
-			raise timeKeeperError.TimeKeeperError(str('Not enough time left for the next elapse to occur. Next elapsed time on average will be ' + str(self.timeKeeping['Next_Elapse']) + ', wall time limit = ' + str(self.timeKeeping['Wall_Time']) ))
+			raise pyanamo_errors.TimeKeeperError(str('Not enough time left for the next elapse to occur. Next elapsed time on average will be ' + str(self.timeKeeping['Next_Elapse']) + ', wall time limit = ' + str(self.timeKeeping['Wall_Time']) ))
 
 		# Otherwise proceed
 		else:
