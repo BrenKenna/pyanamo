@@ -38,8 +38,8 @@ class PyAnamo_TimeKeeper():
 
 		# Check current, elapsed and wall times
 		currentTime = datetime.now()
-		elapsedTime = float( (currentTime - self.timeKeeping['Previous_Time']).total_seconds() )
-		wallTime = float( (currentTime - self.timeKeeping['Creation_Time']).total_seconds() )
+		elapsedTime = round(float( (currentTime - self.timeKeeping['Previous_Time']).total_seconds() ), 2)
+		wallTime = round(float( (currentTime - self.timeKeeping['Creation_Time']).total_seconds() ), 2)
 
 		# Update data
 		self.timeKeeping['Wall_Time'] = wallTime
@@ -47,22 +47,20 @@ class PyAnamo_TimeKeeper():
 		self.timeKeeping['Elapsed_Time'] = elapsedTime
 		self.timeKeeping['Elapsed_Time_Data']['Updates'] += 1
 		self.timeKeeping['Elapsed_Time_Data']['Times'].append(elapsedTime)
-		self.timeKeeping['Average_Elapsed_Time'] = float(sum(self.timeKeeping['Elapsed_Time_Data']['Times']) / len(self.timeKeeping['Elapsed_Time_Data']['Times']))
-		self.timeKeeping['Next_Elapse'] = self.timeKeeping['Wall_Time'] + self.timeKeeping['Average_Elapsed_Time']
+		self.timeKeeping['Average_Elapsed_Time'] = round(float(sum(self.timeKeeping['Elapsed_Time_Data']['Times']) / len(self.timeKeeping['Elapsed_Time_Data']['Times'])), 2)
+		self.timeKeeping['Next_Elapse'] = int(self.timeKeeping['Wall_Time'] + self.timeKeeping['Average_Elapsed_Time'])
 
 	# Check data
 	def check_ElapsedTime(self):
 
 		# Check if elapsed time is above time limit
 		if self.timeKeeping['Wall_Time'] > self.timeKeeping['Time_Limit']:
-			print(self.timeKeeping)
-			raise timeKeeperError.TimeKeeperError()
+			raise timeKeeperError.TimeKeeperError(str('Wall time limit = ' + str(self.timeKeeping['Wall_Time']) + ' exceeded' ))
 
 		# Otherwise check if safe to elapse another average time
 		elif self.timeKeeping['Next_Elapse'] > self.timeKeeping['Time_Limit']:
-			print(self.timeKeeping)
-			raise timeKeeperError.TimeKeeperError('Not enough time left for the next elapse to occur')
+			raise timeKeeperError.TimeKeeperError(str('Not enough time left for the next elapse to occur. Next elapsed time on average will be ' + str(self.timeKeeping['Next_Elapse']) + ', wall time limit = ' + str(self.timeKeeping['Wall_Time']) ))
 
 		# Otherwise proceed
 		else:
-			print('All is well')
+			pass
