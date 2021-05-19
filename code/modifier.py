@@ -93,7 +93,6 @@ class PyAnamo_Modifier(pc.PyAnamo_Client):
 			UpdateExpression="SET #lock = :lockingID, #state = :itemstate, #DateLock = :dateLock, #InstanceID = :instanceID",
 			ReturnValues="UPDATED_NEW"
 		)
-		# return(str(1))
 
 
 	# Verify lockID
@@ -152,7 +151,6 @@ class PyAnamo_Modifier(pc.PyAnamo_Client):
 				},
 			 	UpdateExpression = "SET #lock = :lockingID, #DateDone = :dateDone, #LogLen = :logLen, #Logging = :logs"
 			)
-			# response = self.dynamo_table.update_item(update_kwargs)
 
 		# Handle failed tasks
 		else:
@@ -172,7 +170,6 @@ class PyAnamo_Modifier(pc.PyAnamo_Client):
 				},
 				UpdateExpression = "SET #lock = :lockingID, #DateDone = :dateDone, #LogLen = :logLen, #Logging = :logs"
 			)
-			# response = self.dynamo_table.update_item(update_kwargs)
 
 		# Return response
 		return(response)
@@ -191,6 +188,20 @@ class PyAnamo_Modifier(pc.PyAnamo_Client):
 
 			# Execute update for setting done
 			now = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+
+			# Handle setting itemState = 'done' or 'Wall_Time_Exceeded'
+			response = self.dynamo_table.query(
+				ProjectionExpression = "Log_Length, Nested_Tasks",
+				ExpressionAttributeNames = { "#itemID": "itemID" },
+				ExpressionAttributeValues = { ":itemKey": itemID },
+				KeyConditionExpression = '#itemID = :itemKey'
+			)['Items'][0]
+			if int(response['Log_Length']) == int(response['Nested_Tasks']):
+				itemState = 'done'
+			else:
+				itemState = 'Wall_Time_Exceeded'
+
+			# Update item state
 			response = self.dynamo_table.update_item(
 				Key = {'itemID': str(itemID)},
 				ExpressionAttributeNames = {
@@ -198,12 +209,11 @@ class PyAnamo_Modifier(pc.PyAnamo_Client):
 					"#DateDone": "Done_Date"
 				},
 				ExpressionAttributeValues = {
-					":lockingID": str("done"),
+					":lockingID": str(itemState),
 					":dateDone": str(now)
 				},
 				UpdateExpression = "SET #lock = :lockingID, #DateDone = :dateDone"
 			)
-			# response = self.dynamo_table.update_item(update_kwargs)
 
 		# Handle individual task
 		else:
@@ -237,8 +247,6 @@ class PyAnamo_Modifier(pc.PyAnamo_Client):
 					},
 					UpdateExpression = "ADD #LogLen :logLen"
 				)
-
-				# response = self.dynamo_table.update_item(update_kwargs)
 
 		# Return response
 		return(response)

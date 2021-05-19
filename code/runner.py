@@ -89,9 +89,12 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 
 
 		# Iteratively process taskScripts: Make separate function to parallelize, since update is outside
-		for taskKey in range(0, len(taskScript.keys())):
+		taskScriptKeys = list(taskScript.keys())
+		random.shuffle(taskScriptKeys)
+		while len(taskScriptKeys) != 0:
 
 			# Skip if not todo
+			taskKey = taskScriptKeys.pop(0)
 			task = list(taskScript.keys())[taskKey]
 			if taskScript[task]['Status'] != 'todo':
 				print("\nSkipping task " + str(task) + "\n")
@@ -116,6 +119,25 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 		
 			# Pass the results to Executors nested task log director (Dynamo, Cloudwatch or S3)
 			self.Nested_taskLogDirector(taskDone, self.table_name, self.instanceID, self.s3Bucket, nested_Data)
+
+			# Consult PyAnamo Time Keeper if configured
+			canRunNextTask = 1
+			if 'timeKeeper' in self.__dict and self.timeKeeper != None:
+
+				# Check wall times
+				canRunNextTask = self.checkTime()
+
+				# Break loop in not last task and cannot run next task
+				if len(taskScriptKeys) != 0 and canRunNestTask == 0:
+					print('Breaking Loop due to elapsing wall time')
+					break
+
+				# Handle last task
+				elif len(taskScriptKeys) == 0:
+					canRunNextTask = 1
+
+		# Return
+		return(canRunNextTask)
 
 
 	# Process tasks in the todoDict: table_name, instanceID, s3Bucket: Run this function in parallel if PyAamo Threads >= 2 (random wait at start)
@@ -170,6 +192,21 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 					print("Processing active task as single item")
 					self.handleSingleTasks(todo_item)
 
+					# Consult PyAnamo Time Keeper if next task can be taken
+					canRunNextTask = 1
+					if 'timeKeeper' in self.__dict and self.timeKeeper != None:
+
+						# Check wall times
+						canRunNextTask = self.checkTime()
+
+					# Break loop if not last task and cannot run next task
+					if len(self.todoDict['Items']) != 0 and canRunNestTask == 0:
+						print('Breaking Loop due to elapsing wall time')
+						break
+
+					# Handle last task
+					elif len(taskScriptKeys) == 0:
+						canRunNextTask = 1
 
 			# Handle unavailable items
 			else:
@@ -196,3 +233,28 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 
 		# Print completion summary
 		print("\nProcessing complete, processed N items = " + str(self.doneTasks["N"]))
+
+
+	# Update and consult the PyAnamo timeKeeper
+	def checkTime(self):
+
+		# Check if object
+		if self.timeKeeper == None or 'timeKeeper' not in self.__dict__:
+			print('Time Keeper not set, skipping wall time check on active task')
+			out = int(1)
+
+		# Otherwise update and check wall time
+		else:
+			print('Consulting PyAnamo Time Keeper for next iteration')
+			self.timeKeeper.updateCurrentTime()
+			try:
+				print('Can sh-queeze in another der luv')
+				self.timeKeeper.check_ElapsedTime()
+				out = int(1)
+
+			except pyanamo_errors.TimeKeeperError:
+				print('No time left')
+				out = int(0)
+
+		# Return check status
+		return(out)
