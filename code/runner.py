@@ -188,22 +188,6 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 						print('\nExecution successful, updating itemID = ' + str(itemID))
 
 
-					# Consult PyAnamo Time Keeper if next task can be taken
-					canRunNextTask = 1
-					if self.timeKeeper != None:
-						# Check wall times
-						canRunNextTask = self.checkTime()
-
-					# Break loop if not last task and cannot run next task
-					if len(self.todoDict['Items']) != 0 and canRunNextTask == 0:
-						print('\n\nTimeKeeper: Breaking Loop due to elapsing wall time')
-						self.todoDict['Items'] = []
-
-					# Handle last task
-					elif len(self.todoDict['Items']) == 0:
-						canRunNextTask = 1
-
-
 				# Otherwise process task as a single item
 				else:
 
@@ -211,21 +195,23 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 					print("Processing active task as single item")
 					self.handleSingleTasks(todo_item)
 
-					# Consult PyAnamo Time Keeper if next task can be taken
+
+				# Consult PyAnamo Time Keeper if next task can be taken
+				canRunNextTask = 1
+				if self.timeKeeper != None:
+					# Check wall times
+					canRunNextTask = self.checkTime()
+
+				# Break loop if not last task and cannot run next task
+				if len(self.todoDict['Items']) != 0 and canRunNextTask == 0:
+					print('\n\nTimeKeeper: Breaking Loop due to elapsing wall time')
+					self.doneTasks["N"] += 1
+					self.doneTasks["Items"].append(itemID)
+					break
+
+				# Handle last task
+				elif len(self.todoDict['Items']) == 0:
 					canRunNextTask = 1
-					if self.timeKeeper != None:
-
-						# Check wall times
-						canRunNextTask = self.checkTime()
-
-					# Break loop if not last task and cannot run next task
-					if len(self.todoDict['Items']) != 0 and canRunNextTask == 0:
-						print('\n\nTimeKeeper: Breaking Loop due to elapsing wall time')
-						self.todoDict['Items'] = []
-
-					# Handle last task
-					elif len(self.todoDict['Items']) == 0:
-						canRunNextTask = 1
 
 			# Handle unavailable items
 			else:
