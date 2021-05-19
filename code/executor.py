@@ -201,14 +201,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 			out = str(taskID + '.TaskLog.txt.gz')
 			s3BucketKey = str("PyAnamo/" + table_name + "/" + out)
 			out = self.compresedPushS3(log, out, s3Bucket, s3BucketKey)
-
-			# Parse PyAnamo Tags if <900MB
-			if logSize < 900000000:
-				pyAnamoTags = self.parsePyanamoTags(log)
-				return(["3", out, pyAnamoTags])
-
-			else:
-				return(["1", out, out])
+			return(["1", out, out])
 
 
 	# Manage log push
@@ -258,7 +251,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 		taskLog = nested_Data[nestedID]['Log']
 		log_length = nested_Data['Log_Length']
 		taskScript = nested_Data[nestedID]['TaskScript']
-		data = self.handleLogs(taskLog["stdout"] + taskLog["stderr"], table_name, instanceID, str(taskID + "_" + nestedID), s3Bucket)
+		data = self.handleLogs(taskLog["stdout"] + taskLog["stderr"], table_name, instanceID, taskID, s3Bucket)
 
 		# Update Dynamo according to the Log Handler
 		if data[0] == "0":

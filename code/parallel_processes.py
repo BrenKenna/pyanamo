@@ -63,7 +63,7 @@ def parallel_nested(todo_item):
 	table = dynamodb.Table(aws_kwargs['dynamo_table'])
 
 
-	# Instantiate PyAnamo Runner without getting new todoDict: (self, dynamo_table, s3Bucket = None, Parallel_Nests = 0, aws_region = None, todoDict = None, timeLimit = None)
+	# Instantiate PyAnamo Runner without getting new todoDict
 	pyanamoRunner = runner.PyAnamo_Runner(table, s3Bucket = aws_kwargs['s3_key'], timeLimit = aws_kwargs['timeLimit'])
 	pyanamoRunner.handleNestedItem(todo_item)
 
