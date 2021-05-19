@@ -122,7 +122,7 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 
 			# Consult PyAnamo Time Keeper if configured
 			canRunNextTask = 1
-			if 'timeKeeper' in self.__dict and self.timeKeeper != None:
+			if self.timeKeeper != None:
 
 				# Check wall times
 				canRunNextTask = self.checkTime()
@@ -194,7 +194,7 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 
 					# Consult PyAnamo Time Keeper if next task can be taken
 					canRunNextTask = 1
-					if 'timeKeeper' in self.__dict and self.timeKeeper != None:
+					if self.timeKeeper != None:
 
 						# Check wall times
 						canRunNextTask = self.checkTime()

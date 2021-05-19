@@ -60,6 +60,7 @@ parser.add_argument("-b", "--bucket", action = 'store', type = str, help = "S3 B
 parser.add_argument("-k", "--bucket_Key", action = 'store', type = str, help = "Path on the S3 bucket for PyAnamo to put gzip compressed log files\n")
 parser.add_argument("-i", "--parallel_items", action = 'store', type = int, help = "Optional Argument: Number of parallel processes to fetch todo items\n")
 parser.add_argument("-n", "--parallel_nests", action = 'store', type = int, help = "Optional Argument: Number of parallel processes to act on nested items\n")
+parser.add_argument("-w", "--wall_time", action = 'store', type = str, help = "Optional Argument: Wall time in hours to stop pyanamo from fetching the next todo item / task\n")
 args = parser.parse_args()
 
 
@@ -78,7 +79,8 @@ else:
 	table_name = args.table_name
 	s3Bucket = args.bucket
 	aws_region = args.aws_region
-	# bucketKey = args.bucketKey
+	bucketKey = args.bucketKey
+	timeLimit = args.wall_time
 	sys.stdout.write('\n\nProceeding with table = ' + table_name + '\n')
 
 
@@ -98,8 +100,7 @@ if args.parallel_nests == None or args.parallel_nests == 1:
 else:
 	parallel_nests = args.parallel_nests
 	sys.stdout.write('\nRunning ' + str(parallel_nests) + ' processes for nested items\n')
-
-del parser, argparse
+del parser, argparse, args
 
 
 ######################################################################
@@ -118,7 +119,8 @@ if parallel_items > 1:
 	aws_kwargs = {
 		"region": aws_region,
 		"dynamo_table": table_name,
-		"s3_key": s3Bucket
+		"s3_key": s3Bucket,
+		"timeLimit": timeLimit,
 	}
 
 	# Parallel mode
@@ -137,5 +139,5 @@ else:
 
 	# Instatiate PyAnamo runner
 	sys.stdout.write('\nExecuting PyAnamo Runner\n')
-	pyanamoRunner = runner.PyAnamo_Runner(table, s3Bucket, Parallel_Nests = parallel_nests, aws_region = aws_region, todoDict = 'get')
+	pyanamoRunner = runner.PyAnamo_Runner(table, s3Bucket, Parallel_Nests = parallel_nests, aws_region = aws_region, timeLimit = timeLimit, todoDict = 'get')
 	logging = pyanamoRunner.processItems()
