@@ -59,9 +59,11 @@ done
 
 You will want to know two things for managing your workflows:
 
-​		i). How far along am I with the tasks I setup?
+​	i). How far along am I with the tasks I setup?
 
-​		ii). Is my workflow still active?
+​	ii). Is my workflow still active?
+
+
 
 ### i). Summarize the item states of the items & their nested tasks on DynamoDB
 
