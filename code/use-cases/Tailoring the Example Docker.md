@@ -41,9 +41,9 @@ In order to manage different workflows AWS Batch Job Definition should use globa
 3. Number of items to parallelize over (PYANAMO_ITEMS).
 4. Number of nested tasks to parallelize over (PYANAMO_NESTS).
 
-For the sake of managing multiple workflows users can store an archive of these "***Task Scripts***" on S3, or indeed bake them into the docker container the same way as the "Fetch_and_Run.sh" is before the entry point occurs. In this repo an S3 archive is managed as is provided as an argument in the AWS Batch Job Definition.
+For the sake of managing multiple workflows users can store an archive of these "***Task Scripts***" on S3, or indeed bake them into the docker container the same way as the "Fetch_and_Run.sh" is before the entry point occurs. In this repo an S3 archive is managed and is provided as an argument in the AWS Batch Job Definition.
 
-The steps of the pilot job script are outlined (see "***example_docker/Fetch_and_Run.sh***" for the specific pilot job script):
+The steps of the pilot job script are outlined below (see "***example_docker/Fetch_and_Run.sh***" for the specific pilot job script):
 
 1. ### **Installing software in an AWS Batch Job**
 
@@ -147,18 +147,26 @@ python pyanamo.py -t "${PYANAMO_TABLE}" -b "${S3_BUCKET}" -r "${AWS_REGION}"
 
 ## PyAnamo Task Scripts
 
-PyAnamo uses a standardized schema so that users can run a specific wrapper script with their required arguments. In the example "*HaplotypeCaller.sh*" script is running a Variant Calling ETL over data from the 1 Thousand Genomes (1KG) because it is publicly available. Additionally these task scripts could be anything such as transferring data in/out of cloud.
+PyAnamo uses a standardized schema so that users can run a specific wrapper script with their required arguments. In the example "*HaplotypeCaller-KG.sh*" script is running a "*Variant Calling*" ETL over data from the *Thousand Genomes* (1KG) because it is publicly available sequencing data. Additionally these task scripts could be anything such as transferring data in/out of cloud, downloading websites then checking their sizes etc.
 
-For this variant calling ETL to work on AWS Batch we need to extract / download sequencing data from the 1KG S3 bucket onto the active container, Transform / call variants over this data and then Load / copy the results to an S3 bucket. Our only argument for such an ETL is then a sample to a process, and a region of the genome.
+For this variant calling ETL to work on AWS Batch we need to 
 
-So before submitting job we should run the above installation and list 10 random samples from the 1KG so that we test our ETL locally before scaling out our deployment.
+i). *Extract* i.e download sequencing data from the 1KG S3 bucket onto the active container.
+
+ii). *Transform* i.e call variants over this data.
+
+iii). *Load* i.e copy the results to an S3 bucket.
+
+Our only argument for such an ETL is then a sample to a process, and a region of the genome (for super duper parallelization).
+
+So before submitting job we should **<u>*run the above installation and list 10 random samples from the 1KG*</u>** so that we test our ETL locally before scaling out our deployment.
 
 ```bash
 # List some data from the 1KG Pubic S3 Bucket
 aws s3 ls s3://1000genomes/1000G_2504_high_coverage/data/ | sort -R | head | sed 's/\///g' | awk '{print $NF}' > 1KG-Data.txt
 ```
 
-With some our reference data + software installed and list of to do items, we can now simulate what PyAnamo is going to do with our task script, specifically for two random genes.
+With our reference data + software locally installed and our of list of to do items, we can now simulate what PyAnamo is going to do with our task script, specifically for two random genes.
 
 ```bash
 # Simulate PyAnamo exectuing the task script for the SOD1 and NEK1 genes
