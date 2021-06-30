@@ -49,55 +49,59 @@ The steps of the pilot job script are (see "***example_docker/Fetch_and_Run.sh**
 
 1. ### **Installing software in an AWS Batch Job**
 
-   ```bash
-   # Sanity check aws batch job definition job args
-   PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
-   export AWS_DEFAULT_REGION="us-east-1"
-   scriptsTar=$1
-   echo -e "\\n\\n\\nChecking Args, Node & Java Version\\n"
-   echo -e "Pyanamo Workflow Table = ${PYANAMO_TABLE}"
-   echo -e "PyAnamo Parallel Items = ${PYANAMO_ITEMS}"
-   echo -e "PyAnamo Parallel Nestes = ${PYANAMO_NESTS}"
-   echo -e "S3 Bucket = ${S3_BUCKET}"
-   echo -e "\\nChecks Complete\\n\\nInstalling software\\n"
-   
-   # Set vars for installation
-   export TMPDIR=/tmp/pipeline
-   export wrk=${TMPDIR}
-   export PATH="${wrk}/software/bin:$PATH"
-   mkdir -p ${TMPDIR} && cd ${TMPDIR}
-   
-   # Install miniconda
-   echo -e "\\n\\nInstalling Miniconda\\n\\n\\n"
-   wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-   chmod +x Miniconda3-latest-Linux-x86_64.sh
-   ./Miniconda3-latest-Linux-x86_64.sh -u -b -p ${wrk}/software &>> /dev/null
-   export CMAKE_PREFIX_PATH="${TMPDIR}/software"
-   export PATH=${TMPDIR}/software/bin:$PATH
-   conda install -y -c anaconda boto3 &>> /dev/null
-   conda install -y -c conda-forge r-base=3.6 &>> /dev/null
-   conda install -y -c r r-rpart r-dplyr r-ggplot2 r-rsqlite &>> /dev/null
-   wget -q https://github.com/samtools/samtools/releases/download/1.11/samtools-1.11.tar.bz2
-   tar -xf samtools-1.11.tar.bz2
-   cd samtools-1.11
-   ./configure --prefix=${wrk}/software &>> /dev/null
-   make all all-htslib -j 2 &>> /dev/null
-   make install install-htslib &>> /dev/null
-   echo -e "\\n\\n\\nINSTALL HTSLIB COMPLETE\\n\\nChecking installaion\\n\n"
-   
-   # Get workflow task scripts etc: Stuff saved in a PyAnamo sub-folder
-   # These are the Task Scripts that PyAnamo will try to execute
-   echo -e "\\n\\nInstalling PyAnamo\\n\\n\\n"
-   cd ${wrk}/software/bin
-   aws s3 --quiet cp ${scriptsTar} ${wrk}/software/bin/
-   tar -xf $(basename ${scriptsTar})
-   rm -f $(basename ${scriptsTar})
-   # export PYANAMO=${wrk}/software/bin/PyAnamo
-   export PATH=${wrk}/software/bin/PyAnamo
-   # echo -e "PyAnamo Path = ${PYANAMO}"
-   ```
+```bash
+# Sanity check aws batch job definition job args
+PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
+export AWS_DEFAULT_REGION="us-east-1"
+scriptsTar=$1
+echo -e "\\n\\n\\nChecking Args, Node & Java Version\\n"
+echo -e "Pyanamo Workflow Table = ${PYANAMO_TABLE}"
+echo -e "PyAnamo Parallel Items = ${PYANAMO_ITEMS}"
+echo -e "PyAnamo Parallel Nestes = ${PYANAMO_NESTS}"
+echo -e "S3 Bucket = ${S3_BUCKET}"
+echo -e "\\nChecks Complete\\n\\nInstalling software\\n"
 
-2. ### **Fetching Workflow Table Specific Data / Software**
+# Set vars for installation
+export TMPDIR=/tmp/pipeline
+export wrk=${TMPDIR}
+export PATH="${wrk}/software/bin:$PATH"
+mkdir -p ${TMPDIR} && cd ${TMPDIR}
+
+# Install miniconda
+echo -e "\\n\\nInstalling Miniconda\\n\\n\\n"
+wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+chmod +x Miniconda3-latest-Linux-x86_64.sh
+./Miniconda3-latest-Linux-x86_64.sh -u -b -p ${wrk}/software &>> /dev/null
+export CMAKE_PREFIX_PATH="${TMPDIR}/software"
+export PATH=${TMPDIR}/software/bin:$PATH
+conda install -y -c anaconda boto3 &>> /dev/null
+conda install -y -c conda-forge r-base=3.6 &>> /dev/null
+conda install -y -c r r-rpart r-dplyr r-ggplot2 r-rsqlite &>> /dev/null
+
+# Install & complie software so its executable with all other Miniconda software
+wget -q https://github.com/samtools/samtools/releases/download/1.11/samtools-1.11.tar.bz2
+tar -xf samtools-1.11.tar.bz2
+cd samtools-1.11
+./configure --prefix=${wrk}/software &>> /dev/null
+make all all-htslib -j 2 &>> /dev/null
+make install install-htslib &>> /dev/null
+echo -e "\\n\\n\\nINSTALL HTSLIB COMPLETE\\n\\nChecking installaion\\n\n"
+
+# Get the workflow task scripts etc: Stuff saved in a PyAnamo sub-folder
+# These are the Task Scripts that PyAnamo will try to execute
+echo -e "\\n\\nInstalling PyAnamo\\n\\n\\n"
+cd ${wrk}/software/bin
+aws s3 --quiet cp ${scriptsTar} ${wrk}/software/bin/
+tar -xf $(basename ${scriptsTar})
+rm -f $(basename ${scriptsTar})
+# export PYANAMO=${wrk}/software/bin/PyAnamo
+export PATH=${wrk}/software/bin/PyAnamo
+# echo -e "PyAnamo Path = ${PYANAMO}"
+```
+
+
+
+2. **Fetching Workflow Table Specific Data / Software**
 
 ```bash
 # Load the variables as in "example_docker/job-conf.sh"
@@ -123,6 +127,8 @@ else
 	echo -e "\\nError supplied table = ${PYANAMO_TABLE} not coverd"
 fi
 ```
+
+
 
 3. ### ***Running PyAnamo within an AWS Batch job***
 
