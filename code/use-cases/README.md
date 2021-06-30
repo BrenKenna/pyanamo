@@ -64,7 +64,7 @@ You will want to know two things for managing your workflows:
 
 
 
-### 1. Summarize the item states of the items & their nested tasks on DynamoDB
+### 1. Summarize the todo, locked & done states of the items & their nested tasks on DynamoDB
 
 ```python
 # Import
