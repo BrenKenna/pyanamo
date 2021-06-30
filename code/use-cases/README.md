@@ -59,9 +59,8 @@ done
 
 You will want to know two things for managing your workflows:
 
-​	i). How far along am I with the tasks I setup?
-
-​	ii). Is my workflow still active?
+1.  How far along am I with the tasks I setup?
+2.  Is my workflow still active?
 
 
 
