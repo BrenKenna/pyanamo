@@ -57,7 +57,8 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 		# Handle composing time keeper: Have validation as a function
 		if self.timeLimit != None:
 			self.timeKeeper = ptk.PyAnamo_TimeKeeper(timeLimit)
-
+		else:
+			self.timeKeeper = None
 
 	# Handle processing un-nested / single task items: taskScript, todo_item
 	def handleSingleTasks(self, todo_item):
@@ -137,9 +138,6 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 				# Handle last task
 				elif len(taskScriptKeys) == 0:
 					canRunNextTask = 1
-
-		# Return
-		return(canRunNextTask)
 
 
 	# Process tasks in the todoDict: table_name, instanceID, s3Bucket: Run this function in parallel if PyAamo Threads >= 2 (random wait at start)
