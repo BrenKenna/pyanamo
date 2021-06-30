@@ -6,24 +6,15 @@ Since AWS Batch Job definitions can be created with input arguments and global v
 
 
 
-## Docker 
+## Workflow Docker 
 
-Once the core software is installed the container will execute a custom "***Fetch and Run Script***". The job definition uses global variables for:
-
-1.  PyAnamo Table which in this case is "***HaplotypeCaller***"  (PYANAMO_TABLE).
-
-2. An S3 Bucket to put job related logs into if too big for DynamoDB or CloudWatch (S3_BUCKET).
-
-3. Number of items to parallelize over (PYANAMO_ITEMS).
-
-4. Number of nested tasks to parallelize over (PYANAMO_NESTS).
-
-   
+Once the core software is installed the container will execute a custom "***Fetch and Run Script***" which will install any software / reference data that your workflow needs before running PyAnamo.
 
 ```dockerfile
 FROM amazonlinux:latest
 
 # Install core software
+# Could install something miniconda here, but intentionally saving for the job script
 RUN yum -y update && \
         yum install -y unzip which ls bash du df aws-cli tar time chmod \ 
         	ncurses-compat-libs.x86_64 hostname ncurses-c++-libs.x86_64 \ 
@@ -43,9 +34,16 @@ ENTRYPOINT ["/usr/local/bin/Fetch_and_Run.sh"]
 
 ## Generic Fetch and Run / Pilot Job Script
 
-For the sake of managing multiple workflows users can store an archive of these "***Task Scripts***" on S3, or indeed bake into the docker container the same way as the "Fetch_and_Run.sh" is before the entry point ocurrs. In this repo an S3 archive is managed as is provided as an argument in the AWS Batch Job Definition.
+In order to manage different workflows AWS Batch Job Definition should use global variables for:
 
-The steps of the pilot job script are (see "***example_docker/Fetch_and_Run.sh***"):
+1. The PyAnamo Table which in this case is "***HaplotypeCaller***"  (PYANAMO_TABLE).
+2. An S3 Bucket to put job related logs into if too big for DynamoDB or CloudWatch (S3_BUCKET).
+3. Number of items to parallelize over (PYANAMO_ITEMS).
+4. Number of nested tasks to parallelize over (PYANAMO_NESTS).
+
+For the sake of managing multiple workflows users can store an archive of these "***Task Scripts***" on S3, or indeed bake them into the docker container the same way as the "Fetch_and_Run.sh" is before the entry point occurs. In this repo an S3 archive is managed as is provided as an argument in the AWS Batch Job Definition.
+
+The steps of the pilot job script are outlined (see "***example_docker/Fetch_and_Run.sh***" for the specific pilot job script):
 
 1. ### **Installing software in an AWS Batch Job**
 
@@ -130,7 +128,7 @@ fi
 
 
 
-3. ### ***Running PyAnamo within an AWS Batch job***
+### 3. Running PyAnamo within an AWS Batch Job
 
 ```bash
 # Install PyAnamo
@@ -149,19 +147,32 @@ python pyanamo.py -t "${PYANAMO_TABLE}" -b "${S3_BUCKET}" -r "${AWS_REGION}"
 
 ## PyAnamo Task Scripts
 
-PyAnamo uses a standardized schema so that users can run a specific wrapper script with their required arguments. In the example HaplotypeCaller.sh script this running a Variant Calling ETL over data from the 1 Thousand Genomes (1KG) because it is publicly available. Additionally these task script could be anything such as transferring data in/out of cloud.
+PyAnamo uses a standardized schema so that users can run a specific wrapper script with their required arguments. In the example "*HaplotypeCaller.sh*" script is running a Variant Calling ETL over data from the 1 Thousand Genomes (1KG) because it is publicly available. Additionally these task scripts could be anything such as transferring data in/out of cloud.
 
-For this variant calling ETL to work on AWS Batch we need to extract / download sequencing data from the 1KG S3 bucket, Transform / call variants over this data and then Load / copy the results to an S3 bucket. Our only argument for such an ETL is a sample to a process, and a region of the genome.
+For this variant calling ETL to work on AWS Batch we need to extract / download sequencing data from the 1KG S3 bucket onto the active container, Transform / call variants over this data and then Load / copy the results to an S3 bucket. Our only argument for such an ETL is then a sample to a process, and a region of the genome.
 
-So before submitting job we should run the above installation and try executing the below task script.
+So before submitting job we should run the above installation and list 10 random samples from the 1KG so that we test our ETL locally before scaling out our deployment.
 
 ```bash
-# Locallly test execute the variant calling ETL over some sample from the 1KG bucket
-bash HaplotypeCaller-1KG.sh ${SOME_SAMPLE} ${SOME_LOCI}
+# List some data from the 1KG Pubic S3 Bucket
+aws s3 ls s3://1000genomes/1000G_2504_high_coverage/data/ | sort -R | head | sed 's/\///g' | awk '{print $NF}' > 1KG-Data.txt
 ```
 
+With some our reference data + software installed and list of to do items, we can now simulate what PyAnamo is going to do with our task script, specifically for two random genes.
 
+```bash
+# Simulate PyAnamo exectuing the task script for the SOD1 and NEK1 genes
+locis="chr21:31659566-31669931,chr4:169391809-169613627"
+for sampleID in $(cat 1KG-Data.txt)
+
+	# Locallly test execute the variant calling ETL over some sample from the 1KG bucket
+	bash HaplotypeCaller-1KG.sh ${sampleID} ${locis}
+
+done
+```
+
+With this we're now all set for scaling out the deployment of our Big Data ETL as per "***Submitting Use Case Variant Calling Jobs.md***"
 
 ## Summary
 
-This page covers all of the core background for running PyAnamo in AWS Batch jobs by hijacking through https://aws.amazon.com/blogs/compute/creating-a-simple-fetch-and-run-aws-batch-job/. With the workflow specific AWS Batch Compute Environment and ETL / Task Script and Docker + Generic Pilot Job Script debugged & in place, we can now host the todo list on DynamoDB and submit jobs to do all the work ("***Submitting Use Case Variant Calling Jobs.md***").
+This page covers all of the core background for running PyAnamo in AWS Batch jobs by hijacking through https://aws.amazon.com/blogs/compute/creating-a-simple-fetch-and-run-aws-batch-job/. With the workflow specific AWS Batch Compute Environment and ETL / Task Script and Docker + Generic Pilot Job Script debugged & in place, we can now host the to do list on DynamoDB and submit jobs to do all the work ("***Submitting Use Case Variant Calling Jobs.md***").

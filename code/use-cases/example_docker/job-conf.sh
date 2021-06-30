@@ -2,6 +2,7 @@
 bucket=s3://My_S3_Bucket
 project=${bucket}/projects
 resources=${bucket}/reference_resources
+kg_s3=s3://1000genomes/1000G_2504_high_coverage/data
 
 
 # Results directories

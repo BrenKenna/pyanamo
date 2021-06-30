@@ -7,6 +7,7 @@
 SM=$1
 locis=$2
 wrk=${wrk}/${SM}
+kg_s3=s3://1000genomes/1000G_2504_high_coverage/data
 mkdir -p ${wrk} && cd ${wrk}
 
 
@@ -46,6 +47,12 @@ then
 fi
 
 
+# Download data
+cram=$(aws s3 ls ${kg_s3}/${SM}/ | grep "am$" | awk '{print $NF}')
+aws s3 cp --quiet ${kg_s3}/${SM}/${cram} ${SM}.cram
+aws s3 cp --quiet ${kg_s3}/${SM}/${cram}.crai ${SM}.cram.crai
+
+
 # Iteratively Extract & Call supplied locis
 for loci in $(echo -e "${locis}" | sed 's/,/\n/g' | sort -R)
 	do
@@ -54,13 +61,6 @@ for loci in $(echo -e "${locis}" | sed 's/,/\n/g' | sort -R)
 	chrom=$(echo ${loci} | cut -d \: -f 1)
 	lociOut=$(echo ${loci} | sed -e 's/:/_/g' -e 's/-/_/g')
 	mkdir -p ${wrk}/${chrom} && cd ${wrk}/${chrom}
-
-
-	# Download data
-	cram=$(aws s3 ls ${kg_s3}/${SM}/ | grep "am$" | awk '{print $NF}')
-	aws s3 cp --quiet ${kg_s3}/${SM}/${cram} ${SM}.cram
-	aws s3 cp --quiet ${kg_s3}/${SM}/${cram}.crai ${SM}.cram.crai
-
 
 	# Extract active loci
 	samtools view -h -T ${ref} ${SM}.cram ${chrom} -C > ${SM}.${chrom}.cram
@@ -111,4 +111,4 @@ done
 
 # Clean up
 echo -e "PyAnamo:\\tETL completed for ${SM}"
-
+cd .. && rm -fr ${SM}
