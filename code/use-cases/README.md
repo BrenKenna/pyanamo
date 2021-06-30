@@ -64,7 +64,7 @@ You will want to know two things for managing your workflows:
 
 
 
-### i). Summarize the item states of the items & their nested tasks on DynamoDB
+### 1. Summarize the item states of the items & their nested tasks on DynamoDB
 
 ```python
 # Import
@@ -85,7 +85,7 @@ manager_client.summarize_nestedTasks(table_name)
 itemSummary = manager_client.summarize_nestedTasks(table_name, output_results = 1)
 ```
 
-### ii). Relate AWS batch job states to their item states on DynamoDB
+### 2. Relate AWS batch job states to their item states on DynamoDB
 
 This is useful for checking how many locked items are no longer active because the job that had locked them has since terminated. The out is a dictionary for each AWS Batch Job state and a list of item IDS, so that you can pass the required list of item IDs to some method in the manager client such as: "***reset_itemState***" or "***delete_singleItem***"
 
