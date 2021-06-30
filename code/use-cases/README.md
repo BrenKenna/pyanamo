@@ -1,54 +1,14 @@
-# PyAnamo
 
+# Running PyAnamo in AWS-Batch jobs
+Follows the AWS-Batch "Simple Fetch and Run" tutorial https://aws.amazon.com/blogs/compute/creating-a-simple-fetch-and-run-aws-batch-job/
 
-## Running PyAnamo in AWS-Batch jobs
-Follows AWS-Batch "Simple Fetch and Run" tutorial https://aws.amazon.com/blogs/compute/creating-a-simple-fetch-and-run-aws-batch-job/
-
-
-
-## Setup Docker
-Follows AWS-Batch "Simple Fetch and Run" tutorial
-
-```bash
-# Create ECR repository
-PYANAMO=Path/To/Where/This/Folder/Was/Installed
-DOCKER_INFO=GET_FROM_ECR
-DOCKER_NAME=My_Super_Fun_Happy_Docker
-cd ${PYANAMO}/pyanamo
-
-sudo service docker start
-sudo usermod -a -G docker ec2-user
-pass=$(aws ecr get-login-password --region us-east-1)
-
-sudo docker login --username AWS -p ${pass} ${DOCKER_INFO}
-sudo docker build -t ${DOCKER_NAME} .
-sudo docker tag ${DOCKER_NAME}:latest ${DOCKER_INFO}
-sudo docker push ${DOCKER_INFO}
-```
+Users will also need to make the appropriate edits to the "***job-conf.sh***" to set their own required variables such as output result directories on S3, locations of their own reference data etc etc. For the sake of simplicity the jobs submitted here are only going to run the seq Linux command.
 
 
 
-## Create a Workflow Table
+## a). Create Some Test Tasks
 
-```python
-# Import manager client
-import manager as pmanager
-
-# Instantiate
-table_name = 'Testing'
-aws_region = 'us-east-1' 
-manager_client = pmanager.PyAnamo_Manager(
-    dynamo_table = table_name,
-    region = aws_region
-)
-
-# Create table
-manager_client.create_workflow_table(table_name)
-```
-
-
-
-## Create Some Test Tasks
+The "***code/import-items.py***" wrapper script creates the supplied table if it does not exist. See "***Creating and Managing Workflows.md***" on the repo landing page for any background info.
 
 
 ```bash
@@ -67,7 +27,7 @@ python import-items.py 'Testing' 'us-east-1' 'import-nested-testing.txt' '|' ','
 
 
 
-## Submit & Summarize Job Arrays
+## b). Submit & Summarize Job Arrays
 
 
 ```bash
@@ -95,9 +55,15 @@ done
 
 
 
-## Monitor Workflow Progress
+## c). Monitoring Workflows
 
-### Summarize the item states of the items & their nested tasks on DynamoDB
+You will want to know two things for managing your workflows:
+
+​	i). How far along am I with the tasks I setup?
+
+​	ii). Is my workflow still active?
+
+### i). Summarize the item states of the items & their nested tasks on DynamoDB
 
 ```python
 # Import
@@ -118,7 +84,7 @@ manager_client.summarize_nestedTasks(table_name)
 itemSummary = manager_client.summarize_nestedTasks(table_name, output_results = 1)
 ```
 
-### Relate AWS batch job states to their item states on DynamoDB
+### ii). Relate AWS batch job states to their item states on DynamoDB
 
 This is useful for checking how many locked items are no longer active because the job that had locked them has since terminated. The out is a dictionary for each AWS Batch Job state and a list of item IDS, so that you can pass the required list of item IDs to some method in the manager client such as: "***reset_itemState***" or "***delete_singleItem***"
 
