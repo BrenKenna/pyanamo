@@ -15,7 +15,7 @@ Schema + Definition is below:
 
 ​			User-defined unique identifier for items in a DynamoDB Table (***String***),
 
-​		**taskID:**
+### 		**taskID:**
 
 ​			User-defined non-unique identifier for an item, can equal itemID if non-nested (***String***),
 
