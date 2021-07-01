@@ -40,28 +40,44 @@ Schema + Definition is below:
 # Global Secondary Indexes
 
 [
-                {
-                   "IndexName": "**ItemStateIndex**",
-                   "KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***itemID***", "KeyType": "RANGE" } ],
-                   "Projection": { "ProjectionType": "ALL" }, "ProvisionedThroughput": { "ReadCapacityUnits": 10, "WriteCapacityUnits": 5 }
-                },
 
-​                {
-​                   "IndexName": "**TaskStateIndex**",
-​                   "KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***taskID***", "KeyType": "RANGE" }],
-​                   "Projection": { "ProjectionType": "ALL" },
-​                   "ProvisionedThroughput": { "ReadCapacityUnits": 10, "WriteCapacityUnits": 5 }
-​                },
+​	{
+​		"IndexName": "**ItemStateIndex**",
 
-​                {
-​                   "IndexName": "**InstanceStateIndex**",
-​                   "KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***InstanceID***", "KeyType": "RANGE" } ],
-​                   "Projection": { "ProjectionType": "ALL" }, "ProvisionedThroughput": { "ReadCapacityUnits": 10, "WriteCapacityUnits": 5 }
-​                },
+​					"KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***itemID***", "KeyType": "RANGE" } ],
 
-​                {
-​                   "IndexName": "**LoggingIndex**",
-​                   "KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***Log_Length***", "KeyType": "RANGE" } ],
-​                   "Projection": { "ProjectionType": "ALL" }, "ProvisionedThroughput": { "ReadCapacityUnits": 10, "WriteCapacityUnits": 5 }
-​                }
+​					"Projection": { "ProjectionType": "ALL" }, "ProvisionedThroughput": { "ReadCapacityUnits": 10, "WriteCapacityUnits": 5 }
+
+​	},
+
+​	{
+
+​		"IndexName": "**TaskStateIndex**",
+
+​		 "KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***taskID***", "KeyType": "RANGE" }],
+
+​		"Projection": { "ProjectionType": "ALL" }, "ProvisionedThroughput": { "ReadCapacityUnits": 10, "WriteCapacityUnits": 5 }
+
+​	},
+
+​	{
+
+​		"IndexName": "**InstanceStateIndex**",
+
+​		"KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***InstanceID***", "KeyType": "RANGE" } ],
+
+​		"Projection": { "ProjectionType": "ALL" }, "ProvisionedThroughput": { "ReadCapacityUnits": 10, "WriteCapacityUnits": 5 }
+
+​	},
+
+​	{
+
+​		"IndexName": "**LoggingIndex**",
+
+​		"KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***Log_Length***", "KeyType": "RANGE" } ],
+
+​		"Projection": { "ProjectionType": "ALL" }, "ProvisionedThroughput": { "ReadCapacityUnits": 10, "WriteCapacityUnits": 5 }
+
+​	}
+
 ]
