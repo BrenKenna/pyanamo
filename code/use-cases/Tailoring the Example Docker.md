@@ -59,17 +59,14 @@ echo -e "PyAnamo Parallel Nestes = ${PYANAMO_NESTS}"
 echo -e "S3 Bucket = ${S3_BUCKET}"
 echo -e "\\nChecks Complete\\n\\nInstalling software\\n"
 
-# Set vars for installation
-export TMPDIR=/tmp/pipeline
-export wrk=${TMPDIR}
-export PATH="${wrk}/software/bin:$PATH"
-mkdir -p ${TMPDIR} && cd ${TMPDIR}
 
 # Install miniconda
 echo -e "\\n\\nInstalling Miniconda\\n\\n\\n"
+export TMPDIR=/tmp/pipeline
+mkdir -p ${TMPDIR} && cd ${TMPDIR}
 wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 chmod +x Miniconda3-latest-Linux-x86_64.sh
-./Miniconda3-latest-Linux-x86_64.sh -u -b -p ${wrk}/software &>> /dev/null
+./Miniconda3-latest-Linux-x86_64.sh -u -b -p ${TMPDIR}/software &>> /dev/null
 export CMAKE_PREFIX_PATH="${TMPDIR}/software"
 export PATH=${TMPDIR}/software/bin:$PATH
 conda install -y -c anaconda boto3 &>> /dev/null
@@ -80,7 +77,7 @@ conda install -y -c r r-rpart r-dplyr r-ggplot2 r-rsqlite &>> /dev/null
 wget -q https://github.com/samtools/samtools/releases/download/1.11/samtools-1.11.tar.bz2
 tar -xf samtools-1.11.tar.bz2
 cd samtools-1.11
-./configure --prefix=${wrk}/software &>> /dev/null
+./configure --prefix=${TMPDIR}/software &>> /dev/null
 make all all-htslib -j 2 &>> /dev/null
 make install install-htslib &>> /dev/null
 echo -e "\\n\\n\\nINSTALL HTSLIB COMPLETE\\n\\nChecking installaion\\n\n"
@@ -88,39 +85,39 @@ echo -e "\\n\\n\\nINSTALL HTSLIB COMPLETE\\n\\nChecking installaion\\n\n"
 # Get the workflow task scripts etc: Stuff saved in a PyAnamo sub-folder
 # These are the Task Scripts that PyAnamo will try to execute
 echo -e "\\n\\nInstalling PyAnamo\\n\\n\\n"
-cd ${wrk}/software/bin
-aws s3 --quiet cp ${scriptsTar} ${wrk}/software/bin/
+cd ${TMPDIR}/software/bin
+aws s3 --quiet cp ${scriptsTar} ${TMPDIR}/software/bin/
 tar -xf $(basename ${scriptsTar})
 rm -f $(basename ${scriptsTar})
 # export PYANAMO=${wrk}/software/bin/PyAnamo
-export PATH=${wrk}/software/bin/PyAnamo
+export PATH=${TMPDIR}/software/bin/PyAnamo
 # echo -e "PyAnamo Path = ${PYANAMO}"
 ```
 
 
 
-2. **Fetching Workflow Table Specific Data / Software**
+2. ### **Fetching Workflow Table Specific Data / Software**
 
 ```bash
 # Load the variables as in "example_docker/job-conf.sh"
 # This defines variables described in the Task Scripts
 # and variables such gatk4, ref, refInd below
 . ${PYANAMO}/job-conf.sh
-aws s3 cp --quiet ${key} ${wrk}/ReferenceData/
-export key=${wrk}/ReferenceData/prj_16444.ngc
+aws s3 cp --quiet ${key} ${TMPDIR}/ReferenceData/
+export key=${TMPDIR}/ReferenceData/prj_16444.ngc
 if [ "${PYANAMO_TABLE}" == "HaplotypeCaller" ]
 	then
 
 	# Download HaplotypeCaller Software & Data
 	echo -e "\\nDownloading reference data for HaplotypeCaller\\n"
-	aws s3 cp --quiet ${gatk4} ${wrk}/ReferenceData/
-	aws s3 cp --quiet ${ref} ${wrk}/ReferenceData/
-	aws s3 cp --quiet ${refInd} ${wrk}/ReferenceData/
-	aws s3 cp --quiet ${refDic} ${wrk}/ReferenceData/
-	aws s3 cp --quiet ${tgt} ${wrk}/ReferenceData/
-	export ref=${wrk}/ReferenceData/hs38DH.fa
-	export gatk4=${wrk}/ReferenceData/gatk-package-4.1.4.0-local.jar
-	export tgt=${wrk}/ReferenceData/cds_100bpSplice_utr_codon_mirbase.bed
+	aws s3 cp --quiet ${gatk4} ${TMPDIR}/ReferenceData/
+	aws s3 cp --quiet ${ref} ${TMPDIR}/ReferenceData/
+	aws s3 cp --quiet ${refInd} ${TMPDIR}/ReferenceData/
+	aws s3 cp --quiet ${refDic} ${TMPDIR}/ReferenceData/
+	aws s3 cp --quiet ${tgt} ${TMPDIR}/ReferenceData/
+	export ref=${TMPDIR}/ReferenceData/hs38DH.fa
+	export gatk4=${TMPDIR}/ReferenceData/gatk-package-4.1.4.0-local.jar
+	export tgt=${TMPDIR}/ReferenceData/cds_100bpSplice_utr_codon_mirbase.bed
 else
 	echo -e "\\nError supplied table = ${PYANAMO_TABLE} not coverd"
 fi
@@ -132,11 +129,11 @@ fi
 
 ```bash
 # Install PyAnamo
-cd ${wrk}/software/bin
+cd ${TMPDIR}/software/bin
 git clone --recursive https://github.com/BrenKenna/pyanamo.git
 cd pyanamo
 chmod +x code/*py
-cp code/*py ${wrk}/software/bin/
+cp code/*py ${TMPDIR}/software/bin/
 cd .. && rm -fr code/
 
 # Execute pyanamo
@@ -147,7 +144,7 @@ python pyanamo.py -t "${PYANAMO_TABLE}" -b "${S3_BUCKET}" -r "${AWS_REGION}"
 
 ## PyAnamo Task Scripts
 
-PyAnamo uses a standardized schema so that users can run a specific wrapper script with their required arguments. In the example "*HaplotypeCaller-KG.sh*" script is running a "*Variant Calling*" ETL over data from the *Thousand Genomes* (1KG) because it is publicly available sequencing data. Additionally these task scripts could be anything such as transferring data in/out of cloud, downloading websites then checking their sizes etc.
+PyAnamo uses a standardized schema so that users can run a specific wrapper script with their required arguments. The example "*HaplotypeCaller-KG.sh*" script is running a "*Variant Calling*" ETL over data from the *Thousand Genomes* (1KG) because it is publicly available sequencing data. Additionally these task scripts could be anything such as transferring data in/out of cloud, downloading websites then checking their sizes etc.
 
 For this variant calling ETL to work on AWS Batch we need to 
 
