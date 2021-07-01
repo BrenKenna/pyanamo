@@ -104,7 +104,6 @@ export PATH=${TMPDIR}/software/bin/PyAnamo
 # and variables such gatk4, ref, refInd below
 . ${PYANAMO}/job-conf.sh
 aws s3 cp --quiet ${key} ${TMPDIR}/ReferenceData/
-export key=${TMPDIR}/ReferenceData/prj_16444.ngc
 if [ "${PYANAMO_TABLE}" == "HaplotypeCaller" ]
 	then
 

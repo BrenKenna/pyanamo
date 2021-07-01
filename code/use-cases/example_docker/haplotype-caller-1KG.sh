@@ -48,9 +48,9 @@ fi
 
 
 # Download data
-cram=$(aws s3 ls ${kg_s3}/${SM}/ | grep "am$" | awk '{print $NF}')
-aws s3 cp --quiet ${kg_s3}/${SM}/${cram} ${SM}.cram
-aws s3 cp --quiet ${kg_s3}/${SM}/${cram}.crai ${SM}.cram.crai
+cram=$(aws s3 ls ${kg_s3}/${SM}/ | grep "am" | grep -ve "crai" | awk '{print $NF}')
+aws s3 cp --quiet ${kg_s3}/${SM}/${cram} ${wrk}/${SM}.cram
+aws s3 cp --quiet ${kg_s3}/${SM}/${cram}.crai ${wrk}/${SM}.cram.crai
 
 
 # Iteratively Extract & Call supplied locis
@@ -63,7 +63,7 @@ for loci in $(echo -e "${locis}" | sed 's/,/\n/g' | sort -R)
 	mkdir -p ${wrk}/${chrom} && cd ${wrk}/${chrom}
 
 	# Extract active loci
-	samtools view -h -T ${ref} ${SM}.cram ${chrom} -C > ${SM}.${chrom}.cram
+	samtools view -h -T ${ref} ${wrk}/${SM}.cram ${chrom} -C > ${SM}.${chrom}.cram
 	samtools index ${SM}.${chrom}.cram
 	rm -f ${SM}.cram ${SM}.cram.crai
 
