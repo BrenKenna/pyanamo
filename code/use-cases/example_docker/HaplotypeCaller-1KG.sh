@@ -1,28 +1,27 @@
 #!/bin/bash
 
 
-# Set vars:     Test chroms = NEK1,SOD1
-# . ${PYANAMO}/start.sh
-# uploadID=$(echo $RANDOM % 1000000 + 1 | bc)
+# Parse args
+# . ${PIPELINE}/job-conf.sh
 SM=$1
 locis=$2
 wrk=${wrk}/${SM}
-kg_s3=s3://1000genomes/1000G_2504_high_coverage/data
 mkdir -p ${wrk} && cd ${wrk}
 
 
-# 
-# Check variable assignments
-# echo -e "SM = ${SM} :: Loci ${locis} :: working dir = ${wrk}"
-# echo -e "ref = ${ref} :: Loci ${gatk4} :: tgt = ${tgt} :: kg_s3 = ${kg_s3}"
-# exit
-# 
+# Check input + job-conf variable assignments
+if [ -z ${SM} ] || [ -z ${locis} ] || [ -z ${project} ] || [ -z ${kg_s3} ]
+	echo -e "PyAnamo:\\tError, exiting key ETL variables were not assigned\\n"
+	echo -e "SM = ${SM} :: Loci ${locis} :: kg s3 = ${kg_s3} :: project S3 = ${project}\\n"
+	exit
+fi  
 
 
-# Exit if no input
-if [ -z "${SM}" ]
+# Check ETL specific software & data exists
+if [ ! -f ${ref} ] || [ ! -f ${gatk4} ] || [ ! -f ${tgt} ]
 then
-	echo -e "PyAnamo:\\tExiting, error parsing ${SM}\\n"
+	echo -e "PyAnamo:\\tError, exiting key reference does not exist\\n"
+	echo -e "Ref = ${ref} :: GATK-4 = ${gatk4} :: VCF-Summary-Loci = ${tgt}\\n"
 	cd .. && rm -fr ${SM}
 	exit
 fi
@@ -35,16 +34,6 @@ fi
 #
 #########################################
 #########################################
-
-
-# Check variable assigment
-if [ ! -f ${ref} ] || [ ! -f ${gatk4} ] || [ ! -f ${tgt} ]
-then
-	echo -e "PyAnamo:\\tError, exiting key reference does not exist\\n"
-	echo -e "Ref = ${ref} :: GATK-4 = ${gatk4} :: VCF-Summary-Loci = ${tgt}"
-	cd .. && rm -fr ${SM}
-	exit
-fi
 
 
 # Download data

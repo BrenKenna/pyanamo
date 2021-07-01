@@ -1,14 +1,14 @@
 # Set S3 paths
 bucket=s3://My_S3_Bucket
-project=${bucket}/projects
-resources=${bucket}/reference_resources
-kg_s3=s3://1000genomes/1000G_2504_high_coverage/data
+export project=${bucket}/projects
+export resources=${bucket}/reference_resources
+export kg_s3=s3://1000genomes/1000G_2504_high_coverage/data
 
 
 # Results directories
-bam=${project}/bam
-gvcf=${project}/gvcf
-ancestry=${project}/ancestry
+export bam=${project}/bam
+export gvcf=${project}/gvcf
+export ancestry=${project}/ancestry
 
 
 # Pre-compiled software

@@ -170,7 +170,7 @@ locis="chr21:31659566-31669931,chr4:169391809-169613627"
 for sampleID in $(cat 1KG-Data.txt)
 
 	# Locallly test execute the variant calling ETL over some sample from the 1KG bucket
-	bash haplotype-caller-1kg.sh ${sampleID} ${locis}
+	bash HaplotypeCaller-1KG.sh ${sampleID} ${locis}
 
 done
 ```
