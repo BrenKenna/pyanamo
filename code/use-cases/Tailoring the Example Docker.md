@@ -45,7 +45,7 @@ For the sake of managing multiple workflows users can store an archive of these 
 
 The steps of the pilot job script are outlined below (see "***example_docker/Fetch_and_Run.sh***" for the specific pilot job script):
 
-1. ### **Installing software in an AWS Batch Job**
+### **i). Installing software in an AWS Batch Job**
 
 ```bash
 # Sanity check aws batch job definition job args
@@ -96,7 +96,7 @@ export PATH=${TMPDIR}/software/bin/PyAnamo
 
 
 
-2. ### **Fetching Workflow Table Specific Data / Software**
+### **ii). Fetching Workflow Table Specific Data / Software**
 
 ```bash
 # Load the variables as in "example_docker/job-conf.sh"
@@ -122,9 +122,7 @@ else
 fi
 ```
 
-
-
-### 3. Running PyAnamo within an AWS Batch Job
+### iii). Running PyAnamo within AWS batch jobs
 
 ```bash
 # Install PyAnamo

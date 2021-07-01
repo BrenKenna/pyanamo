@@ -4,34 +4,56 @@ List of key-value pairs: [ { ***item1*** }, { ***item2*** }, { ***item3*** }, { 
 
 Automatically generated fields = ***Nested Tasks, Log, Lock Date, Done Date, lockID***
 
-A nested item holds a collection of tasks to do within its ***TaskScript*** key.
+A nested item holds a collection of tasks to do within its ***TaskScript*** key
 
 Schema + Definition is below: 
 [
 
 ​	{
 
-​		**itemID:** User-defined unique identifier for items in a DynamoDB Table (***String***),
+### 		**itemID:** 
 
-​		**taskID:** User-defined non-unique identifier for an item, can equal itemID if non-nested (***String***),
+​			User-defined unique identifier for items in a DynamoDB Table (***String***),
 
-​		**TaskScript:** What gets executed when PyAnamo verifies the item is still available (***Map / Dictionary***),
+​		**taskID:**
 
-​		**Log:** Output of executing the task script (***Map / Dictionary***), 
+​			User-defined non-unique identifier for an item, can equal itemID if non-nested (***String***),
 
-​		**ItemState:** todo, locked or done (***String***),
+### 		**TaskScript:**
 
-​		**InstanceID:** AWS-Batch JobID, EC2 instance ID or Public IP of computer that locked the item (***String***),
+​			What gets executed when PyAnamo verifies the item is still available (***Map / Dictionary***),
 
-​		**Log_Length:** New line character count of stdout + stderr if single item, or count of how many nested tasks are “done” (***Number***),
+### 		**Log:**
 
-​		**Lock_Date:** Date at which the item was locked (***String***),
+​			Output of executing the task script (***Map / Dictionary***), 
 
-​		**Done_Date:** Date at which the was marked done (***String***),
+### 		**ItemState:**
 
-​		**Nested_Tasks:** Count of the total nested tasks for the item (***Number***),
+​			todo, locked or done (***String***),
 
-​		**lockID:** Randomly generated string to prevent multiple instance pyanamo fetching + processing the same item (***String***)
+### 		**InstanceID:**
+
+​			AWS-Batch JobID, EC2 instance ID or Public IP of computer that locked the item (***String***),
+
+### 		**Log_Length:**
+
+​			New line character count of stdout + stderr if single item, or count of how many nested tasks are “done” (***Number***),
+
+### 		**Lock_Date:**
+
+​			Date at which the item was locked (***String***),
+
+### 		**Done_Date:**
+
+​			Date at which the was marked done (***String***),
+
+### 		**Nested_Tasks:**
+
+​			Count of the total nested tasks for the item (***Number***),
+
+### 		**lockID:**
+
+​			Randomly generated string to prevent multiple instance pyanamo fetching + processing the same item (***String***)
 
 }
 
@@ -43,7 +65,7 @@ Schema + Definition is below:
 
 ​	{
 
-​		"IndexName": "**ItemStateIndex**",
+### 		"IndexName": "**ItemStateIndex**",
 
 ​		"KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***itemID***", "KeyType": "RANGE" } ],
 
@@ -53,7 +75,7 @@ Schema + Definition is below:
 
 ​	{
 
-​		"IndexName": "**TaskStateIndex**",
+### 		"IndexName": "**TaskStateIndex**",
 
 ​		 "KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***taskID***", "KeyType": "RANGE" }],
 
@@ -63,7 +85,7 @@ Schema + Definition is below:
 
 ​	{
 
-​		"IndexName": "**InstanceStateIndex**",
+### 		"IndexName": "**InstanceStateIndex**",
 
 ​		"KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***InstanceID***", "KeyType": "RANGE" } ],
 
@@ -73,7 +95,7 @@ Schema + Definition is below:
 
 ​	{
 
-​		"IndexName": "**LoggingIndex**",
+### 		"IndexName": "**LoggingIndex**",
 
 ​		"KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***Log_Length***", "KeyType": "RANGE" } ],
 
