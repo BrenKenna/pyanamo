@@ -42,11 +42,12 @@ Schema + Definition is below:
 [
 
 ​	{
+
 ​		"IndexName": "**ItemStateIndex**",
 
-​					"KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***itemID***", "KeyType": "RANGE" } ],
+​		"KeySchema": [ { "AttributeName": "***ItemState***", "KeyType": "HASH" }, { "AttributeName": "***itemID***", "KeyType": "RANGE" } ],
 
-​					"Projection": { "ProjectionType": "ALL" }, "ProvisionedThroughput": { "ReadCapacityUnits": 10, "WriteCapacityUnits": 5 }
+​		"Projection": { "ProjectionType": "ALL" }, "ProvisionedThroughput": { "ReadCapacityUnits": 10, "WriteCapacityUnits": 5 }
 
 ​	},
 
