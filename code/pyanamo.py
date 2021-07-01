@@ -24,8 +24,7 @@ try:
 	pyanamo = os.environ['PYANAMO']
 
 except:
-	sys.stderr.write("\n\nExiting, global variable for PYANAMO not found")
-	sys.exit()
+	sys.stderr.write("\n\nWarning global variable for PYANAMO not found, assuming PIPELINE is used")
 
 
 # Try get instanceID

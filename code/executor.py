@@ -15,11 +15,14 @@ cloudwatch_client = boto3.client('logs')
 
 
 # Exit if environmental variables are not defined
-try:
+if 'PYANAMO' in os.environ:
 	pyanamo = os.environ['PYANAMO']
 
-except KeyError:
-	print("\n\nExiting, global variable for PYANAMO not found")
+elif 'PIPELINE' in os.environ:
+	pyanamo = os.environ['PIPELINE']
+
+else:
+	print("\n\nExiting, global variable for PYANAMO or PIPELINE not found")
 
 
 # Class to manage the execution of task scripts
@@ -69,7 +72,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 		try:
 
 			# Execute and parse logs
-			taskScript = taskScript.replace("${PYANAMO}", pyanamo)
+			taskScript = taskScript.replace("${PYANAMO}", pyanamo).replace("${PIPELINE}", pyanamo)
 			proc = Popen(taskScript.split(" "), stdout = PIPE, stderr = PIPE)
 			stdout, stderr = proc.communicate()
 			stdout = stdout.decode('utf-8')
