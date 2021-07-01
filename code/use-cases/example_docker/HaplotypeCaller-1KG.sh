@@ -11,8 +11,10 @@ mkdir -p ${wrk} && cd ${wrk}
 
 # Check input + job-conf variable assignments
 if [ -z ${SM} ] || [ -z ${locis} ] || [ -z ${project} ] || [ -z ${kg_s3} ]
+then
 	echo -e "PyAnamo:\\tError, exiting key ETL variables were not assigned\\n"
 	echo -e "SM = ${SM} :: Loci ${locis} :: kg s3 = ${kg_s3} :: project S3 = ${project}\\n"
+	cd .. && rm -fr ${SM}
 	exit
 fi  
 
@@ -36,12 +38,6 @@ fi
 #########################################
 
 
-# Download data
-cram=$(aws s3 ls ${kg_s3}/${SM}/ | grep "am" | grep -ve "crai" | awk '{print $NF}')
-aws s3 cp --quiet ${kg_s3}/${SM}/${cram} ${wrk}/${SM}.cram
-aws s3 cp --quiet ${kg_s3}/${SM}/${cram}.crai ${wrk}/${SM}.cram.crai
-
-
 # Iteratively Extract & Call supplied locis
 for loci in $(echo -e "${locis}" | sed 's/,/\n/g' | sort -R)
 	do
@@ -50,6 +46,11 @@ for loci in $(echo -e "${locis}" | sed 's/,/\n/g' | sort -R)
 	chrom=$(echo ${loci} | cut -d \: -f 1)
 	lociOut=$(echo ${loci} | sed -e 's/:/_/g' -e 's/-/_/g')
 	mkdir -p ${wrk}/${chrom} && cd ${wrk}/${chrom}
+
+	# Download data
+	cram=$(aws s3 ls ${kg_s3}/${SM}/ | grep "am" | grep -ve "crai" | awk '{print $NF}')
+	aws s3 cp --quiet ${kg_s3}/${SM}/${cram} ${wrk}/${SM}.cram
+	aws s3 cp --quiet ${kg_s3}/${SM}/${cram}.crai ${wrk}/${SM}.cram.crai
 
 	# Extract active loci
 	samtools view -h -T ${ref} ${wrk}/${SM}.cram ${chrom} -C > ${SM}.${chrom}.cram
