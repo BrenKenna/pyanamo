@@ -32,7 +32,8 @@ Schema + Definition is below:
 ​		**Nested_Tasks:** Count of the total nested tasks for the item (***Number***),
 
 ​		**lockID:** Randomly generated string to prevent multiple instance pyanamo fetching + processing the same item (***String***)
-​	}
+
+}
 
 ]
 
