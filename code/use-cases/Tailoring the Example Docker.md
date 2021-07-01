@@ -84,14 +84,14 @@ echo -e "\\n\\n\\nINSTALL HTSLIB COMPLETE\\n\\nChecking installaion\\n\n"
 
 # Get the workflow task scripts etc: Stuff saved in a PyAnamo sub-folder
 # These are the Task Scripts that PyAnamo will try to execute
-echo -e "\\n\\nInstalling PyAnamo\\n\\n\\n"
+echo -e "\\n\\nInstalling Pipeline Scripts\\n\\n\\n"
 cd ${TMPDIR}/software/bin
 aws s3 --quiet cp ${scriptsTar} ${TMPDIR}/software/bin/
 tar -xf $(basename ${scriptsTar})
 rm -f $(basename ${scriptsTar})
-# export PYANAMO=${wrk}/software/bin/PyAnamo
-export PATH=${TMPDIR}/software/bin/PyAnamo
-# echo -e "PyAnamo Path = ${PYANAMO}"
+export PIPELINE=${wrk}/software/bin/$(basename ${scriptsTar} | cut -d \. -f 1)
+export PATH=${PATH}:${TMPDIR}/software/bin/$(basename ${scriptsTar} | cut -d \. -f 1)
+echo -e "Pipeline Scripts Path = ${PIPELINE}"
 ```
 
 
@@ -102,7 +102,7 @@ export PATH=${TMPDIR}/software/bin/PyAnamo
 # Load the variables as in "example_docker/job-conf.sh"
 # This defines variables described in the Task Scripts
 # and variables such gatk4, ref, refInd below
-. ${PYANAMO}/job-conf.sh
+. ${PIPELINE}/job-conf.sh
 aws s3 cp --quiet ${key} ${TMPDIR}/ReferenceData/
 if [ "${PYANAMO_TABLE}" == "HaplotypeCaller" ]
 	then
@@ -168,7 +168,7 @@ locis="chr21:31659566-31669931,chr4:169391809-169613627"
 for sampleID in $(cat 1KG-Data.txt)
 
 	# Locallly test execute the variant calling ETL over some sample from the 1KG bucket
-	bash HaplotypeCaller-1KG.sh ${sampleID} ${locis}
+	bash ${PIPELINE}/HaplotypeCaller-1KG.sh ${sampleID} ${locis}
 
 done
 ```
