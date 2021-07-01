@@ -47,7 +47,7 @@ class PyAnamo_TimeKeeper():
 		self.timeKeeping['Elapsed_Time_Data']['Updates'] += 1
 
 		# Stop times list from getting too big
-		if len(self.timeKeeping['Elapsed_Time_Data']['Times']) == 10:
+		if len(self.timeKeeping['Elapsed_Time_Data']['Times']) == 15:
 			self.timeKeeping['Elapsed_Time_Data']['Times'] = [ round(self.timeKeeping['Average_Elapsed_Time'], 1) ]
 			self.timeKeeping['Elapsed_Time_Data']['Times'].append(elapsedTime)
 
@@ -60,13 +60,13 @@ class PyAnamo_TimeKeeper():
 	# Check data
 	def check_ElapsedTime(self):
 
-		# Check if elapsed time is above time limit
+		# Check if elapsed time is above the specified time limit
 		if self.timeKeeping['Wall_Time'] > self.timeKeeping['Time_Limit']:
-			raise pyanamo_errors.TimeKeeperError(str('Wall time limit = ' + str(self.timeKeeping['Wall_Time']) + ' exceeded' ))
+			raise pyanamo_errors.TimeKeeperError(str('Wall time limit of ' + str(self.timeKeeping['Time_Limit']) + 's has exceeded with ' + str(self.timeKeeping['Wall_Time']) + 's' ))
 
-		# Otherwise check if safe to elapse another average time
+		# Otherwise check if it is safe to elapse another average time
 		elif self.timeKeeping['Next_Elapse'] > self.timeKeeping['Time_Limit']:
-			raise pyanamo_errors.TimeKeeperError(str('Not enough time left for the next elapse to occur. Next elapsed time on average will be ' + str(self.timeKeeping['Next_Elapse']) + ', wall time limit = ' + str(self.timeKeeping['Wall_Time']) ))
+			raise pyanamo_errors.TimeKeeperError(str('Not enough time left for the next elapse to occur. Next elapsed time on average will be ' + str(self.timeKeeping['Next_Elapse']) + 's, wall time limit = ' + str(self.timeKeeping['Time_Limit']) + 's'))
 
 		# Otherwise proceed
 		else:

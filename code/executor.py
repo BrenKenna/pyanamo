@@ -141,21 +141,25 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 
 		# Create log group if none
 		response = cloudwatch_client.describe_log_groups(logGroupNamePrefix = logGroup)
-		if len(response["logGroups"]) == 0:
-			response = cloudwatch_client.create_log_group(logGroupName = logStream)
+		if response['logGroups'] == []:
+			# print('\nCreating Cloud Watch log group = ' + logGroup)
+			response = cloudwatch_client.create_log_group(logGroupName = logGroup)
+		# else:
+		# 	print('\nFound Cloud Watch log group = ' + logGroup + ' for adding events')
+
 
 		# Handle updating / creating the log stream
 		response = cloudwatch_client.describe_log_streams(logGroupName = logGroup, logStreamNamePrefix = logStream)
-		if len(response["logStreams"]) == 0:
+		if response["logStreams"] == []:
 
-			# Create log stream
+			# Create log stream and push the event
 			response = cloudwatch_client.create_log_stream(logGroupName = logGroup, logStreamName = logStream)
 			response = cloudwatch_client.put_log_events(logGroupName = logGroup, logStreamName = logStream, logEvents = taskMessage)
 			return("Created Cloudwatch " + logGroup + logStream)
 
 		else:
 
-			# Otherwise update
+			# Otherwise update and push the event
 			nextSequenceToken = response["logStreams"][0]["uploadSequenceToken"]
 			response = cloudwatch_client.put_log_events(logGroupName = logGroup, logStreamName = logStream, sequenceToken = nextSequenceToken, logEvents = taskMessage)
 			return("Updated Cloudwatch " + logGroup + logStream)

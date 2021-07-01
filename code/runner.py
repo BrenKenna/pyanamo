@@ -132,7 +132,7 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 
 				# Break loop in not last task and cannot run next task
 				if len(taskScriptKeys) != 0 and canRunNextTask == 0:
-					print('\n\nTimeKeeper: Breaking Loop due to elapsing wall time')
+					print('\n\nTimeKeeper: Breaking the Nested Item Loop due to elapsing allowed wall time')
 					break
 
 				# Handle last task
@@ -202,7 +202,7 @@ class PyAnamo_Runner(executor.PyAnamo_Executor):
 
 				# Break loop if not last task and cannot run next task
 				if len(self.todoDict['Items']) != 0 and canRunNextTask == 0:
-					print('\n\nTimeKeeper: Breaking Loop due to elapsing wall time')
+					print('\n\nTimeKeeper: Breaking the Engine Loop due to elapsing the allowed wall time')
 					self.doneTasks["N"] += 1
 					self.doneTasks["Items"].append(itemID)
 					break

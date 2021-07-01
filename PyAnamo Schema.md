@@ -29,7 +29,7 @@ Schema + Definition is below:
 
 ### 		**ItemState:**
 
-​			todo, locked or done (***String***),
+​			todo, locked, done or Wall_Time_Exceeded for nested items if running PyAnamo with a wall time limit in seconds (***String***),
 
 ### 		**InstanceID:**
 
