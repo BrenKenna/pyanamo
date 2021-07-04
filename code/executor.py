@@ -18,10 +18,10 @@ cloudwatch_client = boto3.client('logs')
 if 'PYANAMO' in os.environ:
 	pyanamo = os.environ['PYANAMO']
 
-elif 'PIPELINE' in os.environ:
+if 'PIPELINE' in os.environ:
 	pyanamo = os.environ['PIPELINE']
 
-else:
+if 'PIPELINE' not in os.environ and 'PYANAMO' not in os.environ:
 	print("\n\nExiting, global variable for PYANAMO or PIPELINE not found")
 
 

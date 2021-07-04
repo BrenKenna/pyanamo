@@ -101,4 +101,4 @@ done
 
 # Clean up
 echo -e "PyAnamo:\\tETL completed for ${SM}"
-cd .. && rm -fr ${SM}
+# cd .. && rm -fr ${SM}
