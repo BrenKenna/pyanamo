@@ -611,7 +611,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			print('Error, please provide table_name, item as a list, or taskKey or allTasks')
 
 		# Handle items as a list
-		elif type(item) is list:
+		elif type(itemList) is list:
 
 			# Verify first item
 			if type(itemList[0]) is dict:
