@@ -861,7 +861,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			'done': { 'N': 0, 'Items': [] }
 		}
 
-		# Populate todo, done
+		# Populate todo, done (PyAnamo-Engine client to)
 		for itemState in [ 'todo', 'done' ]:
 			itemStateData = self.getToDoItems(itemState, recursively = 0, pyanamo_fields = None)
 			nested_task_summary[itemState]['N'] = itemStateData['N']
@@ -869,7 +869,7 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 			print( str('Item State = ' + itemState + ' N = ' + str(nested_task_summary[itemState]['N'])) )
 
 
-		# Get locked items
+		# Get locked items (PyAnamo-Engine client)
 		lockedItems = self.getToDoItems('locked', recursively = 0, pyanamo_fields = 'itemID, TaskID, Nested_Tasks, Log_Length, TaskScript, Log')
 
 
