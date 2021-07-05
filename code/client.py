@@ -25,7 +25,7 @@ class PyAnamo_Client():
 		# Dynamo
 		if type(dynamo_table) is str:
 			self.dynamodb = boto3.resource('dynamodb', region_name = region)
-			self.dynamo_table = self.dynamodb.Table(dynamo_tableName)
+			self.dynamo_table = self.dynamodb.Table(dynamo_table)
 
 		elif type(dynamo_table) is not str:
 			self.dynamo_table = dynamo_table
