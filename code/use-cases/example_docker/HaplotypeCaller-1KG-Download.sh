@@ -6,18 +6,17 @@
 SM=$1
 locis=$2
 wrk=${wrk}/${SM}
-cram=$(aws s3 ls ${kg_s3}/${SM}/ | grep "am" | grep -ve "crai" | awk '{print $NF}')
 mkdir -p ${wrk} && cd ${wrk}
 # date | awk '{print "PyAnamo:\t"$0}'
-# sleep $(($RANDOM % 12))s
+sleep $(($RANDOM % 12))s
 # date | awk '{print "PyAnamo:\t"$0}'
 
 
 # Check input + job-conf variable assignments
-if [ -z ${SM} ] || [ -z ${locis} ] || [ -z ${project} ] || [ -z ${kg_s3} ] || [ -z ${cram} ]
+if [ -z ${SM} ] || [ -z ${locis} ] || [ -z ${project} ] || [ -z ${kg_s3} ]
 then
 	echo -e "PyAnamo:\\tError, exiting key ETL variables were not assigned\\n"
-	echo -e "SM = ${SM} :: CRAM = ${cram} :: Loci ${locis} :: kg s3 = ${kg_s3} :: project S3 = ${project}\\n"
+	echo -e "SM = ${SM} :: Loci ${locis} :: kg s3 = ${kg_s3} :: project S3 = ${project}\\n"
 	cd .. && rm -fr ${SM}
 	exit
 fi  
@@ -42,6 +41,27 @@ fi
 #########################################
 
 
+# Wait for main download to finish
+# ls -lh -lha ${wrk}/*cram* | awk '{print "PyAnamo:\t"$0}'
+if [ ! -z `ls -lha ${wrk}/*cram* | awk 'NR == 1 { print $1 }'` ]
+then
+	# echo -e "PyAnamo:\\tWaiting for active download to complete"
+	while [ ! -f ${wrk}/${SM}.cram.crai ]
+		do
+		sleep 2m
+	done
+
+else
+
+	# Download data
+	# echo -e "PyAnamo:\\tDownloading CRAM"
+	cram=$(aws s3 ls ${kg_s3}/${SM}/ | grep "am" | grep -ve "crai" | awk '{print $NF}')
+	aws s3 cp --quiet ${kg_s3}/${SM}/${cram} ${wrk}/${SM}.cram
+	aws s3 cp --quiet ${kg_s3}/${SM}/${cram}.crai ${wrk}/${SM}.cram.crai
+
+fi
+
+
 # Iteratively Extract & Call supplied locis
 for loci in $(echo -e "${locis}" | sed 's/,/\n/g' | sort -R)
 	do
@@ -53,7 +73,7 @@ for loci in $(echo -e "${locis}" | sed 's/,/\n/g' | sort -R)
 
 
 	# Extract active loci
-	samtools view -Ch -T ${ref} ${kg_s3}/${SM}/${cram} ${chrom} > ${SM}.${chrom}.cram
+	samtools view -h -T ${ref} ${wrk}/${SM}.cram ${chrom} -C > ${SM}.${chrom}.cram
 	samtools index ${SM}.${chrom}.cram
 
 
@@ -100,3 +120,7 @@ done
 
 # Clean up
 echo -e "PyAnamo:\\tETL completed for ${SM}"
+if [ -z `ls | grep "chr"` ]
+then
+	cd .. && rm -fr ${SM}
+fi

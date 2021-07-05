@@ -103,8 +103,8 @@ def nested_items(nested_item, Nprocesses, aws_kwargs):
 	availableThreads = mp.cpu_count()
 	if Nprocesses > availableThreads:
 		Nprocesses = availableThreads
-
 	pool = PyAnamo_ProcessPool(Nprocesses)
+
 
 	# Handle tasks per process
 	taskPerProcess = int(len(nested_item['TaskScript'].keys()) / Nprocesses)
