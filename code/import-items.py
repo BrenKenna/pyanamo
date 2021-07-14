@@ -2,7 +2,7 @@
 
 
 # Import modules
-import sys, json
+import sys, json, time
 import manager as pmanager
 
 
@@ -15,6 +15,7 @@ user_data = {
 	'nested_delim': None
 }
 
+
 # Add nested delimiter if provided
 if len(sys.argv) > 5:
 	user_data['nested_delim'] = sys.argv[5]
@@ -25,6 +26,17 @@ manager_client = pmanager.PyAnamo_Manager(dynamo_table = user_data['table_name']
 tableExists = manager_client.check_table(user_data['table_name'])
 if tableExists == 0:
 	tableCreated = manager_client.create_workflow_table(user_data['table_name'])
+
+
+# Wait for table to be created
+for i in range(0, 5):
+	try:
+		manager_client.handle_DynamoTable(user_data['table_name'])
+		out = manager_client.getToDoItems('todo', recursively = 0, pyanamo_fields = None)
+
+	except:
+		print('\n\nWaiting for table to be configured\n')
+		time.sleep(10)
 
 
 # Import data

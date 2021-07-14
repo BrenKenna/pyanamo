@@ -20,6 +20,7 @@ echo -e "PyAnamo Parallel Items = ${PYANAMO_ITEMS}"
 echo -e "PyAnamo Parallel Nestes = ${PYANAMO_NESTS}"
 echo -e "S3 Bucket = ${S3_BUCKET}"
 echo -e "Pipeline Scripts = ${scriptsTar}"
+df -h
 echo -e "\\nChecks Complete\\n\\nInstalling software\\n"
 
 
@@ -99,6 +100,7 @@ if [ "${PYANAMO_TABLE}" == "HaplotypeCaller" ] || [ "${PYANAMO_TABLE}" == "KG_Te
 	export gatk4=${wrk}/ReferenceData/gatk-package-4.1.4.0-local.jar
 	export tgt=${wrk}/ReferenceData/cds_100bpSplice_utr_codon_mirbase.bed
 	ls -lh ${ref} ${gatk}
+	df -h
 else
 	echo -e "\\nError supplied table = ${PYANAMO_TABLE} not coverd"
 fi

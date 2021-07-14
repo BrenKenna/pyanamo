@@ -7,9 +7,9 @@ SM=$1
 locis=$2
 wrk=${wrk}/${SM}
 mkdir -p ${wrk} && cd ${wrk}
-# date | awk '{print "PyAnamo:\t"$0}'
+date | awk '{print "PyAnamo:\t"$0}'
 sleep $(($RANDOM % 12))s
-# date | awk '{print "PyAnamo:\t"$0}'
+date | awk '{print "PyAnamo:\t"$0}'
 
 
 # Check input + job-conf variable assignments
@@ -45,7 +45,7 @@ fi
 # ls -lh -lha ${wrk}/*cram* | awk '{print "PyAnamo:\t"$0}'
 if [ ! -z `ls -lha ${wrk}/*cram* | awk 'NR == 1 { print $1 }'` ]
 then
-	# echo -e "PyAnamo:\\tWaiting for active download to complete"
+	echo -e "PyAnamo:\\tWaiting for active download to complete"
 	while [ ! -f ${wrk}/${SM}.cram.crai ]
 		do
 		sleep 2m
@@ -54,7 +54,7 @@ then
 else
 
 	# Download data
-	# echo -e "PyAnamo:\\tDownloading CRAM"
+	echo -e "PyAnamo:\\tDownloading CRAM"
 	cram=$(aws s3 ls ${kg_s3}/${SM}/ | grep "am" | grep -ve "crai" | awk '{print $NF}')
 	aws s3 cp --quiet ${kg_s3}/${SM}/${cram} ${wrk}/${SM}.cram
 	aws s3 cp --quiet ${kg_s3}/${SM}/${cram}.crai ${wrk}/${SM}.cram.crai
@@ -81,7 +81,8 @@ for loci in $(echo -e "${locis}" | sed 's/,/\n/g' | sort -R)
 	if [ `samtools view -T ${ref} ${SM}.${chrom}.cram ${chrom} | head | wc -l` -lt 10 ]
 	then
 		echo -e "PyAnamo:\\tExiting, error extracting ${chrom} from ${SM}\\n"
-		# cd .. && rm -fr ${chrom}
+		df -h | awk '{print "PyAnamo:\t"$0}'
+		cd .. && rm -fr ${chrom}
 		exit
 	fi
 
@@ -120,7 +121,7 @@ done
 
 # Clean up
 echo -e "PyAnamo:\\tETL completed for ${SM}"
-if [ -z `ls | grep "chr"` ]
+if [ -z `ls ${wrk} | grep "chr"` ]
 then
 	cd .. && rm -fr ${SM}
 fi
