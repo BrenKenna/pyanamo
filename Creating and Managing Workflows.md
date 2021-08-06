@@ -237,6 +237,41 @@ results = manager_client.getItem_JobStates(table_name)
 
 ## Managing Workflow Tasks
 
+### Getting Item Logs
+
+```python
+# Setup
+import manager as pmanager
+table_name = 'Testing_1'
+aws_region = 'us-east-1'
+manager_client = pmanager.PyAnamo_Manager(dynamo_table = table_name, region = aws_region)
+
+
+# Get a list of fields for a specific collection of item states: todo, locked and done
+done_logs = manager_client.getToDoItems('done', recursively = 0, pyanamo_fields = 'itemID, TaskID, Nested_Tasks, Log_Length, Log, ItemState')
+
+
+# Get the number of returned items
+done_logs['N']
+
+
+# Print the keys of each returned item
+for i in done_logs['Items']:
+	print(i.keys())
+
+
+# Get the stdout for each nested task of a specific item
+for task in itemData['Log'].keys():
+	itemData['Log'][task]['stdout']
+
+
+# Check stderr of each nested task for an item
+for task in itemData['Log'].keys():
+	print(itemData['itemID'] + " stderr length = " + str(len(itemData['Log'][task]['stderr'])))
+```
+
+
+
 ### Restarting PyAnamo Tasks
 
 Items on DynamoDB have 3 states that PyAnamo works with: '*todo, locked and done*'. The PyAnamo Engine only requests items with an itemState of todo, it then tries to lock these and marks them as done once it finished where it moves onto the next one (conflicts managed during locking).

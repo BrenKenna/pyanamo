@@ -870,10 +870,11 @@ class PyAnamo_Manager(pc.PyAnamo_Client):
 
 
 		# Get locked items (PyAnamo-Engine client)
-		lockedItems = self.getToDoItems('locked', recursively = 0, pyanamo_fields = 'itemID, TaskID, Nested_Tasks, Log_Length, TaskScript, Log')
+		lockedItems = self.getToDoItems('locked', recursively = 0, pyanamo_fields = 'itemID, TaskID, Nested_Tasks, Log_Length, TaskScript, Log, ItemState')
 
 
 		# Analyze results: Q1 = 1-25%, Q2 = 26-50%, Q3 = 51-75%, Q4 = 75-99%
+		print('\n\nChecking the progress of the locked items, N = ' + str(int(lockedItems['N'])) + '\n')
 		for N in range(0, int(lockedItems['N'])):
 			itemDict = lockedItems['Items'].pop(0)
 			pct_progress = int(float(int(itemDict['Log_Length']) / int(itemDict['Nested_Tasks'])) * 100)
