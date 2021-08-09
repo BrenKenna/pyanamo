@@ -61,7 +61,7 @@ fi
 
 
 	# Call variants & sanity check results
-	java -Djava.io.tmpdir=${wrk}/${chrom} -jar ${gatk4} HaplotypeCaller --QUIET true -R ${ref} -I ${SM}.${chrom}.cram -O ${SM}.${chrom}.g.vcf.gz -L ${chrom} -ERC GVCF --native-pair-hmm-threads 2
+	java -Djava.io.tmpdir=${wrk}/${chrom} -jar ${gatk4} HaplotypeCaller --QUIET true -R ${ref} -I ${SM}.${chrom}.cram -O ${SM}.${chrom}.g.vcf.gz -L ${chrom} -ERC GVCF --native-pair-hmm-threads 1
 	rm -f ${SM}.${chrom}.cram ${SM}.${chrom}.cram.crai
 
 
@@ -72,8 +72,7 @@ fi
 		cd .. && rm -fr ${SM}
 		exit
 	fi
-	bash ${PYANAMO}/gVCF_Check-2.sh ${SM}.${chrom}.g.vcf.gz ${chrom}
-	awk '{print "PyAnamo:\t"$0}' ${SM}.${chrom}_checks.tsv
+	bash ${PIPELINE}/gVCF_Check.sh ${SM}.${chrom}.g.vcf.gz ${chrom}
 
 
 	# Compress archive results
@@ -86,6 +85,8 @@ fi
 	# echo -e "\\nCalling for ${chrom} over ${SM} completed\\n"
 	aws s3 cp --quiet ${wrk}/${SM}.${chrom}.tar.gz ${gvcf}/${SM}/${SM}.${chrom}.tar.gz
 	aws s3 cp --quiet ${wrk}/${SM}.${chrom}.md5sum ${gvcf}/${SM}/${SM}.${chrom}.md5sum
+	remoteData=$(aws s3 ls --summarize ${gvcf}/${SM}/${SM}.${chrom}.tar.gz | sed 's/ /;/g')
+	awk '{print "PyAnamo:\t"$0"\t'${remoteData}'"}' ${chrom}/${SM}.${chrom}_checks.tsv | sed 's/;/\t/g'
 	rm -fr ${chrom}
 
 done
