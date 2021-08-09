@@ -85,7 +85,7 @@ echo -e "\\n\\nFetching reference data\\n"
 export wrk=${TMPDIR}/${PYANAMO_TABLE}
 mkdir -p ${wrk}/ReferenceData && cd ${wrk}/ReferenceData
 . ${PIPELINE}/job-conf.sh
-aws s3 cp --quiet ${key} ${TMPDIR}/ReferenceData/
+aws s3 cp --quiet ${key} ${wrk}/ReferenceData/
 if [ "${PYANAMO_TABLE}" == "HaplotypeCaller" ] || [ "${PYANAMO_TABLE}" == "KG_Testing" ]
 	then
 

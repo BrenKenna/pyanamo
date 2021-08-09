@@ -87,7 +87,6 @@ fi
 	aws s3 cp --quiet ${wrk}/${SM}.${chrom}.md5sum ${gvcf}/${SM}/${SM}.${chrom}.md5sum
 	remoteData=$(aws s3 ls --human-readable ${gvcf}/${SM}/${SM}.${chrom}.tar.gz | sed 's/ \+/\t/g' | awk '{print $3""$4"\t'${gvcf}'/'${SM}'/"$NF}' | sed 's/\t/;/g')
 	awk '{print "PyAnamo:\t"$0"\t'${remoteData}'"}' ${chrom}/${SM}.${chrom}_checks.tsv | sed 's/;/\t/g'
-	sleep 5m
 	rm -fr ${chrom}
 
 done
