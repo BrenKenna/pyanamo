@@ -34,8 +34,8 @@ chmod +x Miniconda3-latest-Linux-x86_64.sh
 export CMAKE_PREFIX_PATH="${TMPDIR}/software"
 export PATH=${TMPDIR}/software/bin:$PATH
 conda install -y -c anaconda boto3 &>> /dev/null
-conda install -y -c conda-forge r-base=3.6 &>> /dev/null
-conda install -y -c r r-rpart r-dplyr r-ggplot2 r-rsqlite &>> /dev/null
+# conda install -y -c conda-forge r-base=3.6 &>> /dev/null
+# conda install -y -c r r-rpart r-dplyr r-ggplot2 r-rsqlite &>> /dev/null
 
 
 # Install & complie software so its executable with all other Miniconda software
@@ -51,8 +51,10 @@ echo -e "\\n\\n\\nINSTALL HTSLIB COMPLETE\\n\\nChecking installaion\\n\n"
 # Install PyAnamo
 echo -e "\\nInstalling PyAnamo\\n"
 cd ${TMPDIR}/software/bin
-git clone --recursive https://github.com/BrenKenna/pyanamo.git &>> /dev/null
+git clone --recursive https://github.com/BrenKenna/pyanamo.git
+ls -lhd ${TMPDIR}/software/bin/*/
 cd pyanamo
+ls -lh *py
 chmod +x code/*py
 cp code/*py ${TMPDIR}/software/bin/
 export PYANAMO=${TMPDIR}/software/bin/pyanamo/code
@@ -86,7 +88,7 @@ export wrk=${TMPDIR}/${PYANAMO_TABLE}
 mkdir -p ${wrk}/ReferenceData && cd ${wrk}/ReferenceData
 . ${PIPELINE}/job-conf.sh
 aws s3 cp --quiet ${key} ${wrk}/ReferenceData/
-if [ "${PYANAMO_TABLE}" == "HaplotypeCaller" ] || [ "${PYANAMO_TABLE}" == "KG_Testing" ]
+if [ "${PYANAMO_TABLE}" == "TOPMed_Calling" ] || [ "${PYANAMO_TABLE}" == "KG_Testing" ]
 	then
 
 	# Download HaplotypeCaller Software & Data
@@ -117,6 +119,7 @@ fi
 
 # Run without parallelization
 echo -e "\\n\\nSetup complete. Executing application\\n"
+cd $PYANAMO
 if [ -z "${PYANAMO_ITEMS}" ] && [ -z "${PYANAMO_NESTS}" ]
 then
 
