@@ -12,7 +12,7 @@ base=$(basename ${inp})
 iid=$(zcat ${inp} | head -n 10000 | grep "#CHROM" | cut -f 10)
 size=$(du -sh ${inp} | awk '{print $1}')
 length=$(tabix ${inp} -R ${tgt} | wc -l)
-width=$(zcat ${inp} | grep -v "\#" | awk '{print NF}' | sort | uniq -c | awk '{print $2}')
+width=$(zcat ${inp} | grep -v "\#" | awk '{print NF}' | sort | uniq -c | awk '{print $2}' | xargs | sed 's/ /,/g')
 NVar=$(tabix ${inp} -R ${tgt} | grep -c "MQ")
 
 
@@ -32,4 +32,4 @@ variantSummary=${GQ20},${GQ60},${GQ90}
 
 # Create table
 # echo -e "IID\\tAccession\\tgVCF\\tDisk_Usage\\tWidth\\tLength\\tN_Variants\\tGenome_GQ_Summary(GT_20,GT_60,GT_90)\\tVariant_GQ_Summary(GT_20,GT_60,GT_90)" > ${acc}_checks.tsv
-echo -e "${chrom}\\t${length}\\t${NVar}\\t${variantSummary}" >> ${acc}_checks.tsv
+echo -e "${chrom}\\t${width}\\t${length}\\t${NVar}\\t${variantSummary}" > ${acc}_checks.tsv
