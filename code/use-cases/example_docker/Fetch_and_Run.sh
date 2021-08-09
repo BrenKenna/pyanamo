@@ -34,8 +34,8 @@ chmod +x Miniconda3-latest-Linux-x86_64.sh
 export CMAKE_PREFIX_PATH="${TMPDIR}/software"
 export PATH=${TMPDIR}/software/bin:$PATH
 conda install -y -c anaconda boto3 &>> /dev/null
-# conda install -y -c conda-forge r-base=3.6 &>> /dev/null
-# conda install -y -c r r-rpart r-dplyr r-ggplot2 r-rsqlite &>> /dev/null
+conda install -y -c conda-forge r-base=3.6 &>> /dev/null
+conda install -y -c r r-rpart r-dplyr r-ggplot2 r-rsqlite &>> /dev/null
 
 
 # Install & complie software so its executable with all other Miniconda software
@@ -51,10 +51,8 @@ echo -e "\\n\\n\\nINSTALL HTSLIB COMPLETE\\n\\nChecking installaion\\n\n"
 # Install PyAnamo
 echo -e "\\nInstalling PyAnamo\\n"
 cd ${TMPDIR}/software/bin
-git clone --recursive https://github.com/BrenKenna/pyanamo.git
-ls -lhd ${TMPDIR}/software/bin/*/
+git clone --recursive https://github.com/BrenKenna/pyanamo.git &>> /dev/null
 cd pyanamo
-ls -lh *py
 chmod +x code/*py
 cp code/*py ${TMPDIR}/software/bin/
 export PYANAMO=${TMPDIR}/software/bin/pyanamo/code
@@ -88,6 +86,8 @@ export wrk=${TMPDIR}/${PYANAMO_TABLE}
 mkdir -p ${wrk}/ReferenceData && cd ${wrk}/ReferenceData
 . ${PIPELINE}/job-conf.sh
 aws s3 cp --quiet ${key} ${wrk}/ReferenceData/
+export key=${wrk}/ReferenceData/prj_16444.ngc
+
 if [ "${PYANAMO_TABLE}" == "TOPMed_Calling" ] || [ "${PYANAMO_TABLE}" == "KG_Testing" ]
 	then
 
@@ -103,6 +103,16 @@ if [ "${PYANAMO_TABLE}" == "TOPMed_Calling" ] || [ "${PYANAMO_TABLE}" == "KG_Tes
 	export tgt=${wrk}/ReferenceData/cds_100bpSplice_utr_codon_mirbase.bed
 	ls -lh ${ref} ${gatk}
 	df -h
+
+
+	# Sanity check querying chr21
+	echo -e "\\n\\nSanity checking querying chr21"
+	SM=SRR6776674
+	cram=$(curl -sX POST -F ngc="@${key}" "https://www.ncbi.nlm.nih.gov/Traces/sdl/1/retrieve?acc=${SM}&location=s3.us-east-1" | grep "cram" | grep -v "crai" | grep "link" | cut -d \: -f 2- | sed -e 's/,$//g' -e 's/^ //g' -e 's/https:\/\//https:\/\/\//g' -e "s/\"//g")
+	crai=$(curl -sX POST -F ngc="@${key}" "https://www.ncbi.nlm.nih.gov/Traces/sdl/1/retrieve?acc=${SM}&location=s3.us-east-1" | grep "crai" | grep "link" | cut -d \: -f 2- | sed -e 's/,$//g' -e 's/^ //g' -e 's/https:\/\//https:\/\/\//g' -e "s/\"//g")
+	samtools view -H -T ${ref} ${cram} -X ${crai} chr21 | wc -l | awk '{print "N Header lines = "$0}'
+	echo -e "\\nSanity check complete"
+
 else
 	echo -e "\\nError supplied table = ${PYANAMO_TABLE} not coverd"
 fi
