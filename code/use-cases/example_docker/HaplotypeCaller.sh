@@ -57,7 +57,7 @@ do
 		echo -e "PyAnamo:\\tExiting, error extracting ${chrom} from ${SM}\\n"
 		cd .. && rm -fr ${SM}
 		exit
-fi
+	fi
 
 
 	# Call variants & sanity check results
