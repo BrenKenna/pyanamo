@@ -17,7 +17,8 @@ import manager as pmanager
 
 
 # Parse arguments
-parser = argparse.ArgumentParser(description = """Import a list of items into the supplied DynamoDB table from a file. The specified DynamoDB table is created if it does not exists. The input file must adhere to the standardized PyAnamo schema. The format for the input file is shown below and must include the header. The field delimiter must be provided, whereas the nested task delimiter is an optional argument.
+parser = argparse.ArgumentParser(
+	description = """Import a list of items into the supplied DynamoDB table from a file. The specified DynamoDB table is created if it does not exists. The input file must adhere to the standardized PyAnamo schema. The format for the input file is shown below and must include the header. The field delimiter must be provided, whereas the nested task delimiter is an optional argument.
 
 Example Input Data Format:
 
@@ -62,6 +63,7 @@ if args.parallel_items != None:
 	user_data['nested_delim'] = args.nested_delimiter
 
 del parser, argparse, args
+
 
 ##################################################
 ##################################################
