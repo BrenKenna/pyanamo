@@ -24,7 +24,7 @@ Example Input Data Format:
 	itemID|TaskID|TaskScript|TaskArgs
 	SRR6776829_TARDBP_FUS|SRR6776829|bash ${PIPELINE}/HaplotypeCaller.sh SRR6776829|chr1:11012344-11030528,chr16:31180138-31191605
 
-	Field Delimiter = '|'
+	Field Delimiter = '|' or ',' or '\\t' or ';' etc
 	OPTIONAL Nested task delimiter = ','
 """, formatter_class = argparse.RawTextHelpFormatter)
 
