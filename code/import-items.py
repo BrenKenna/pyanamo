@@ -59,7 +59,7 @@ else:
 	}
 
 # Handle optional arguments
-if args.parallel_items != None:
+if args.nested_delimiter != None:
 	user_data['nested_delim'] = args.nested_delimiter
 
 del parser, argparse, args

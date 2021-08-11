@@ -82,7 +82,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 
 			# Update output dict
 			taskLog["Done_Date"] = str(now)
-			taskLog["Log"]["Status"] = str("Execution Successful")
+			taskLog["Log"]["Status"] = str("Done")
 			taskLog["Log"]["stdout"] = str(stdout)
 			taskLog["Log"]["stderr"] = str(stderr)
 			taskLog["Log_Length"] = int(log_length)
@@ -187,7 +187,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 			pyAnamoTags = self.parsePyanamoTags(log)
 			logGroup = "/PyAnamo/"
 			taskID = re.sub('_Task_[0-9]*', '', taskID)
-			logStream = str(table_name + "/" + instanceID + "/" + taskID)
+			logStream = str(table_name + "/"  + taskID)
 			taskMessage = [
 				{
 					"timestamp": int(round(time.time() * 1000)),
@@ -233,7 +233,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 		# Otherwise push the modified log
 		elif data[0] == "1":
 			print(str("\nUpdating Dynamo with taskLog modification"))
-			taskLog["Log"]["Status"] = str("Execution Successful: " + data[1])
+			taskLog["Log"]["Status"] = str(data[1])
 			taskLog["Log"]["stdout"] = data[2]
 			taskLog["Log"]["stderr"] = ""
 
@@ -271,7 +271,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 		# Otherwise push the modified log
 		elif data[0] == "1":
 			print(str("\nUpdating Dynamo with taskLog modification"))
-			taskLog["Status"] = str("Execution Successful: " + data[1])
+			taskLog["Status"] = str(data[1])
 			taskLog["stdout"] = data[2]
 			taskLog["stderr"] = ""
 			nested_Data[nestedID]['Log'] = taskLog
