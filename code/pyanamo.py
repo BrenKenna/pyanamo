@@ -47,10 +47,6 @@ except:
 # Parse arguments
 parser = argparse.ArgumentParser(description = "Pilot job framework to iterate over items in the supplied DynanmoDB table.\nIncludes argument to facilitate processing nested items, or running in auto-detect mode.", formatter_class = argparse.RawTextHelpFormatter)
 
-# Handle conflicting arguments
-group = parser.add_mutually_exclusive_group()
-group.add_argument("-v", "--verbose", action = "store_true")
-group.add_argument("-q", "--quiet", action = "store_true")
 
 # Arguments for code
 parser.add_argument("-t", "--table_name", action = 'store', type = str, help = "DynamoDB table to query\n")

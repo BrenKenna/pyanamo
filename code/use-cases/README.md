@@ -19,7 +19,7 @@ Seq_Test_4|Seq_5_8_2|seq|5,8,2
 " > import-nested-testing.txt
 
 # Import
-python import-items.py 'Testing' 'us-east-1' 'import-nested-testing.txt' '|' ','
+python import-items.py -t 'Testing' -r 'us-east-1' -i 'import-nested-testing.txt' -d '|' -n ','
 
 # Run PyAnamo to process the above to do items
 python pyanamo.py -t "Testing" -b "${S3_BUCKET}" -r "${AWS_REGION}"

@@ -62,7 +62,7 @@ Level_2_Time|Level_2|bash SuperMarioPlayTimeOptimizer.sh 2 Easy,Normal,Hard
 " > import-testing.txt
 
 # Import list of single items
-python import-items.py 'Example_Table' 'us-east-1' 'import-testing.txt' '|'
+python import-items.py -r 'us-east-1' -t 'Example_Table' -i 'import-testing.txt' -d '|'
 
 
 # Write a list nested items to the same table: Delimiters optional
@@ -71,12 +71,12 @@ itemID|TaskID|TaskScript|TaskArgs
 Seq_Tests|Seq_8_2_1|seq|8,2,1
 Sample1|Sample1|bash use_cases/example_docker/HaplotypeCaller Sample_1|chr1,chr2,chr3
 Level_1_Difficulty_Time|Level_1|bash SuperMarioPlayTimeOptimizer.sh 1|Easy,Normal,Hard
-Level_2_Time|Level_2|bash SuperMarioPlayTimeOptimizer.sh 2 Easy,Normal,Hard
+Level_2_Time|Level_2|bash SuperMarioPlayTimeOptimizer.sh 2|Easy,Normal,Hard
 " > import-nested-testing.txt
 
 
 # Import
-python import-items.py 'Example_Table' 'us-east-1' 'import-nested-testing.txt' '|' ','
+python import-items.py -r 'us-east-1' -t 'Example_Table' -i 'import-testing.txt' -d '|' -n ','
 ```
 
 
