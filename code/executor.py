@@ -171,8 +171,8 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 		"""
 			Determine where to put the task log.
 			<2KB = DynamoDB
-			2KB - 100KB = Cloudwatch
-			>100KB = S3
+			2KB - 10MB = Cloudwatch Parsing
+			>10MB = S3
 		"""
 
 		# Update dynamo if < 2KB
@@ -181,7 +181,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 			return(["0", "DynamoDB"])
 
 		# Direct to cloudwatch if 2KB -> 10MB
-		elif logSize > 2000 and logSize < 20000000:
+		elif logSize > 2000 and logSize < 10000000:
 
 			# Parse out PyAnamo tags + Cloud watch push
 			pyAnamoTags = self.parsePyanamoTags(log)
@@ -206,6 +206,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 
 			# Compress to S3 file
 			out = str(taskID + '.TaskLog.txt.gz')
+			s3Bucket = s3Bucket.replace('s3://', '').replace('s3:/', '').replace('s3:', '')
 			s3BucketKey = str("PyAnamo/" + table_name + "/" + out)
 			out = self.compresedPushS3(log, out, s3Bucket, s3BucketKey)
 			return(["1", out, out])
