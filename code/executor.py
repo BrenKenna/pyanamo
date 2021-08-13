@@ -181,7 +181,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 			return(["0", "DynamoDB"])
 
 		# Direct to cloudwatch if 2KB -> 10MB
-		elif logSize > 2000 and logSize < 100000:
+		elif logSize > 2000 and logSize < 20000000:
 
 			# Parse out PyAnamo tags + Cloud watch push
 			pyAnamoTags = self.parsePyanamoTags(log)
