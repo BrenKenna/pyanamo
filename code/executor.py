@@ -128,7 +128,7 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 		# Push file to s3 and remove
 		response = s3_client.upload_file(out, s3Bucket, s3BucketKey)
 		os.remove(out)
-		return("Compressed to S3 " + str("s3://" + s3Bucket + "/" + s3BucketKey))
+		return("Compressed active log to S3 = " + str("s3://" + s3Bucket + "/" + s3BucketKey))
 
 
 	# Handle push / updating log streams
@@ -237,7 +237,6 @@ class PyAnamo_Executor(pm.PyAnamo_Modifier):
 			taskLog["Log"]["Status"] = str(data[1])
 			taskLog["Log"]["stdout"] = data[2]
 			taskLog["Log"]["stderr"] = ""
-
 			self.updateItemLog(taskDone, itemID, taskLog)
 
 		else:
