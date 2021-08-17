@@ -269,11 +269,18 @@ for task in itemData['Log'].keys():
 for task in itemData_second['Log'].keys():
 	itemData_second['Log'][task]['stdout']
 
+
 # Check the length of stdout
 for task in itemData['Log'].keys():
     task_log = itemData['Log'][task]['stdout']
-	str(task + ' = ' + str(len( task_log.split('\n') )))
+    str(task + ' = ' + str(len( task_log.split('\n') )))
 
+
+# Compare stdout logs of an item
+len( itemData['Log']['Task_1']['stdout'].split(' ') )
+len(itemData['Log']['Task_2']['stdout'].split(' '))
+
+(itemData['itemID'] + '\t' + itemData['Log']['Task_2']['stdout']).split('\t')
 
 # Check stderr of each nested task for an item
 for task in itemData['Log'].keys():
