@@ -282,6 +282,7 @@ len(itemData['Log']['Task_2']['stdout'].split(' '))
 
 (itemData['itemID'] + '\t' + itemData['Log']['Task_2']['stdout']).split('\t')
 
+
 # Check stderr of each nested task for an item
 for task in itemData['Log'].keys():
 	print(itemData['itemID'] + " stderr length = " + str(len(itemData['Log'][task]['stderr'])))
