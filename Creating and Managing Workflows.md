@@ -245,6 +245,7 @@ import manager as pmanager
 table_name = 'Testing_1'
 aws_region = 'us-east-1'
 manager_client = pmanager.PyAnamo_Manager(dynamo_table = table_name, region = aws_region)
+manager_client.handle_DynamoTable(table_name)
 
 
 # Get a list of fields for a specific collection of item states: todo, locked and done
