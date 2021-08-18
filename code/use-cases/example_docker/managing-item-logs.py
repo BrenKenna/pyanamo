@@ -111,7 +111,7 @@ for itemData in done_logs['Items']:
 				sample_Failed['TaskScript'].update( failed_task )
 			else:
 				sample_Completed[itemID].append(task_log)
-	if len(sample_Failed['TaskScript']) != 0:
+	if len( sample_Failed['TaskScript'].keys() ) != 0:
 		progress_check['Failed'].append(sample_Failed)
 		progress_check['Completed'].update(sample_Completed)
 	else:
