@@ -43,6 +43,14 @@ fi
 for chrom in $(echo -e "${chroms}" | sed 's/,/\n/g' | sort -R)
 do
 
+	# Check if gVCF is already called
+	if [ ! -z `aws s3 ls ${gvcf}/${SM}/ | grep -c "${SM}.${chrom}.tar.gz$"` ]
+	then
+		echo -e "\\nExiting, gVCF for ${chrom} already exists"
+		exit
+	fi
+
+
 	# Extract active loci
 	mkdir -p ${wrk}/${chrom} && cd ${wrk}/${chrom}
 	cram=$(curl -sX POST -F ngc="@${key}" "https://www.ncbi.nlm.nih.gov/Traces/sdl/1/retrieve?acc=${SM}&location=s3.us-east-1" | grep "cram" | grep -v "crai" | grep "link" | cut -d \: -f 2- | sed -e 's/,$//g' -e 's/^ //g' -e 's/https:\/\//https:\/\/\//g' -e "s/\"//g")
@@ -88,6 +96,7 @@ do
 	remoteData=$(aws s3 ls --human-readable ${gvcf}/${SM}/${SM}.${chrom}.tar.gz | sed 's/ \+/\t/g' | awk '{print $3""$4"\t'${gvcf}'/'${SM}'/"$NF}' | sed 's/\t/;/g')
 	awk '{print "PyAnamo:\t"$0"\t'${remoteData}'"}' ${chrom}/${SM}.${chrom}_checks.tsv | sed 's/;/\t/g'
 	rm -fr ${chrom}
+	rm -f ${SM}.${chrom}.tar.gz ${SM}.${chrom}.md5sum
 
 done
 
