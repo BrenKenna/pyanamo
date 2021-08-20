@@ -43,7 +43,7 @@ fi
 for chrom in $(echo -e "${chroms}" | sed 's/,/\n/g' | sort -R)
 do
 
-	# Check if gVCF is already called
+	# Exit if gVCF is already called
 	if [ ! -z `aws s3 ls ${gvcf}/${SM}/ | grep -c "${SM}.${chrom}.tar.gz$"` ]
 	then
 		echo -e "\\nExiting, gVCF for ${chrom} already exists"
@@ -103,4 +103,4 @@ done
 
 # Clean up
 # echo -e "PyAnamo:\\tETL completed for ${SM}"
-cd .. && rm -fr ${SM}
+# cd .. && rm -fr ${SM}

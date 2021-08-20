@@ -253,3 +253,56 @@ manager_client = pmanager.PyAnamo_Manager(
 )
 data = manager_client.read_jsonFile(data)
 
+
+
+
+##################################################
+##################################################
+# 
+# Restart Tasks With No Work Done
+# 
+##################################################
+##################################################
+
+
+
+# Import
+cd $PYANAMO
+python
+import manager as pmanager
+
+
+
+# Instantiate
+table_name = 'TOPMed_Calling'
+aws_region = 'us-east-1'
+manager_client = pmanager.PyAnamo_Manager(dynamo_table = table_name, region = aws_region)
+manager_client.handle_DynamoTable(table_name)
+
+
+
+
+# Summarize nested tasks: Counts + itemIDs of 0%, 1-25%, 26-75%, 76-99%, done
+itemSummary = manager_client.summarize_nestedTasks(table_name, output_results = 1)
+
+
+
+
+# Directly restart available items
+itemsToRestart = [  ]
+
+for item in itemSummary['todo']['Items']:
+	if type(item) == dict:
+		itemsToRestart.append(item['itemID'])
+	elif type(item) == str:
+		itemsToRestart.append(item)
+	else:
+		continue
+
+
+
+itemUpdated = manager_client.reset_itemState(table_name = table_name, itemState = 'todo', item = itemsToRestart)
+
+
+
+
