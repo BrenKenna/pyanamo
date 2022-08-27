@@ -2,7 +2,7 @@
 
 
 ## Introduction
-The purpose of *PyAnamo* is to automate "Big Data" *'Extraction Transformation and Loading'* procedures, ETLs, on AWS using Batch &amp; DynamoDB. The principal of operation is that each job executes an application that iterates over a list of work to do, *tasks*, which are stored in a database. The database is populated with various collections of to do items that represent all of the work to do from your favourite workflow. Where each individual *collection* is a step of your workflow, stored in a DynamoDB table. The database can then be queried to monitor progress of each step of the workflow.
+The purpose of *PyAnamo* is to automate "Big Data" *'Extraction Transformation and Loading'* procedures, ETLs, on AWS using Batch &amp; DynamoDB. The principal of operation is under a "Pilot Job Framework", where each job executes an application that iterates over a list of work to do, *tasks*, which are stored in a database. The database is populated with various collections of to do items that represent all of the work to do from your favourite workflow. Where each individual *collection* is a step of your workflow, stored in a DynamoDB table. The database can then be queried to monitor progress of each step of the workflow.
 
 Each item for a given collection has a *"Task Script"* key whose value is executed by a *Generic PyAnamo Application*. The setup allows for each instance of the application, running across the cluster of size N, to iteratively execute *'Program A'* on all tasks in the collection of *'Workflow Step A'*. The application could also be potentially ported into existing setups at the users own discretion, ex 'https://doi.org/10.1093/bioinformatics/btz379'.
 
